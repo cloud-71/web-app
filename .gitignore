@@ -23,5 +23,5 @@
 hs_err_pid*
 
 #node libraries
-/webapp/node_modules/
-/webapp/.next/
+/node_modules/
+/.next/

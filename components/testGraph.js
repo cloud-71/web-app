@@ -1,21 +1,21 @@
-import { VictoryBar, VictoryChart } from 'victory';
+import {VictoryBar, VictoryChart} from 'victory';
 
-export default class TestGraph extends React.Component {
-  constructor(props) {
+export default class TestGraph extends React.Component{
+  constructor(props){
     super(props);
   }
 
-  render() {
+  render(){
     const data = this.props.data;
     console.log(data);
-    if (data.length > 0) {
-      return (
+    if (data.length > 0){
+      return(
         <VictoryChart domainPadding={20}>
-          <VictoryBar data={data} />
+          <VictoryBar data={data}/>
         </VictoryChart>
-      );
-    } else {
-      return <div></div>;
+      )
+    }else {
+      return <div></div>
     }
   }
 }

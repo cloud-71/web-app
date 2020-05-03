@@ -1,8 +1,8 @@
-export default function (req, res) {
+export default function(req, res){
   let result = getResult();
-  res.status(200).json({ text: result });
+  res.status(200).json({text: result});
 }
 
-function getResult() {
-  return 'Hello World';
+function getResult(){
+  return "Hello World";
 }
