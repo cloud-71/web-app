@@ -2,7 +2,7 @@ FROM node:12.16.1-slim
 
 WORKDIR /app
 
-COPY webapp/ .
+COPY . .
 
 RUN npm install --ci
 
