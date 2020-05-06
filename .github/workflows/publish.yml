@@ -6,8 +6,6 @@ on:
     branches:
       - master
   pull_request:
-    branches: 
-      - master
 
 env:
   IMAGE_NAME: web-app
