@@ -2,10 +2,8 @@ name: Docker
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
     branches:
       - master
-  pull_request:
 
 env:
   IMAGE_NAME: web-app
