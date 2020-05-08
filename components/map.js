@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { Map, TileLayer } from 'react-leaflet';
+import { Map, TileLayer, GeoJSON } from 'react-leaflet';
 //Placeholder for geojson data
 import data from '../res/out2.json';
 
@@ -33,6 +33,7 @@ class MyMap extends Component {
             attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <GeoJSON data={data} />
         </Map>
       </div>
     );

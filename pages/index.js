@@ -4,7 +4,7 @@ import TestGraph from '../components/testGraph.js';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 
-//leaflet doesn't seem to like server side rendering. Cause it's dynamic?
+//TODO look into getting map working with SSR. Does it matter?
 const Map = dynamic(() => import('../components/map'), {
   ssr: false,
 });
