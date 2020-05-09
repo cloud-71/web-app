@@ -1,7 +1,9 @@
 import * as Nano from 'nano';
 
 function graphDB() {
-  let n = Nano('http://admin:admin@localhost:5984'); //https://username:password@url
+  let n = Nano(
+    process.env['COUCHDB_URL'] || 'http://admin:admin@localhost:5984',
+  ); //https://username:password@url
 
   let graphDB = n.db.use('graphs');
   if (graphDB == null) {
