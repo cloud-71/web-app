@@ -1,17 +1,20 @@
-import * as Nano from 'nano';
+import Nano from 'nano';
 
-function graphDB() {
-  let n = Nano(
-    process.env['COUCHDB_URL'] || 'http://admin:admin@localhost:5984',
-  ); //https://username:password@url
-
-  let graphDB = n.db.use('graphs');
-  if (graphDB == null) {
-    //graphDB = await n.db.create("graphs");
-    //graphDB = n.db.use("graphs");
+async function graphDB(connection) {
+  try {
+    await connection.db.create('graph');
+    return connection.use('graph');
+  } catch {
+    return connection.use('graph');
   }
-  //console.log(graphDB);
-  return graphDB;
 }
 
-export default graphDB();
+const connection = (function connect() {
+  const host = process.env['COUCHDB_HOST'] || 'localhost:5984';
+  const username = process.env['COUCHDB_USERNAME'] || 'admin';
+  const password = process.env['COUCHDB_PASSWORD'] || 'admin';
+  return Nano(`http://${username}:${password}@${host}`);
+})()
+
+export { connection };
+export default graphDB;

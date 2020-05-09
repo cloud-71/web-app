@@ -1,15 +1,16 @@
-import graphDB from '../../db/graphdb.js';
+import graphDB, { connection } from '../../db/graphdb.js';
 
 export default async function (req, res) {
-  //console.log(graphDB);
+  const db = await graphDB(connection);
+
   if (req.method == 'GET') {
-    let graphs = await graphDB.list();
+    const graphs = await db.list();
     console.log(graphs);
-    let result = graphs.rows;
+    const result = graphs.rows;
     res.status(200).json(result);
   } else if (req.method == 'POST') {
-    let graphData = req.body;
-    let result = await graphDB.insert({ graphData });
+    const graphData = req.body;
+    const result = await db.insert({ graphData });
     res.status(200).json(result.id);
   }
 }

@@ -1,7 +1,8 @@
-import graphDB from '../../../db/graphdb.js';
+import graphDB, { connection } from '../../../db/graphdb.js';
 
 export default async function (req, res) {
-  let graphId = req.query.graphid;
-  let result = await graphDB.get(graphId);
+  const db = await graphDB(connection);
+  const graphId = req.query.graphid;
+  const result = await db.get(graphId);
   res.status(200).json(result);
 }
