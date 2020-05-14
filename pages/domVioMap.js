@@ -8,6 +8,9 @@ export default class Page extends React.Component {
   }
 
   async componentDidMount(){
+    //you can't use import with ReactLeaflet because leaflet needs to be instantiated on client
+    //while nextjs compiles the modules on server
+    //This is a workaround
     ReactLeaflet = await require('react-leaflet');
     Map = await ReactLeaflet.Map;
     TileLayer = await ReactLeaflet.TileLayer;
@@ -15,9 +18,10 @@ export default class Page extends React.Component {
     Rectangle = await ReactLeaflet.Rectangle;
     Tooltip = await ReactLeaflet.Tooltip;
     this.forceUpdate();
-    //Map = ReactLeaflet.Map;
-    //Circle = ReactLeaflet.Circle
 
+    //fetch domestic abuse data
+    //dataset used is
+    //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_lga_jul2013_jun2018
     let domVioData = await fetch("/api/domesticViolence");
     domVioData = await domVioData.json();
     console.log(domVioData);
@@ -25,6 +29,7 @@ export default class Page extends React.Component {
   }
 
   incidentsYearLocation(domVioData){
+    //categorises number of domestic violence in each region in each year
     if (domVioData == null || domVioData.length == 0)
       return {}
 
@@ -41,13 +46,15 @@ export default class Page extends React.Component {
     return obj;
   }
 
-  locations(domVioData){
+  locationInfo(domVioData){
+    //formats region coordinates informations
     if (domVioData == null || domVioData.length == 0)
       return {};
 
     let obj = {}
     domVioData.map(d => d.doc.properties).forEach(p =>
       obj[p.lga_name11]= {
+        //reverse because AURIN data uses [long, lat], while leaflet needs [lat, long]
         center: [(p.bbox[1] + p.bbox[3])/2, (p.bbox[0] + p.bbox[2])/2],
         boundary: [[p.bbox[1], p.bbox[0]], [p.bbox[3], p.bbox[2]]],
         apprRadius: (Math.abs(p.bbox[0]-p.bbox[2]) + Math.abs(p.bbox[1]-p.bbox[3]))/2
@@ -57,6 +64,7 @@ export default class Page extends React.Component {
   }
 
   mapCoordinates(domVioData){
+    //calculates the initial map boundaries
     if (domVioData == null || domVioData.length == 0)
       return {};
 
@@ -72,6 +80,7 @@ export default class Page extends React.Component {
       console.log(maxX + "," + maxY + "," + minX + "," + minY)
     });
     let obj = {
+      //reverse indexes because AURIN data uses [long, lat], while leaflet needs [lat, long]
       boundary: [[minY, minX], [maxY, maxX]],
       center: [(minY + maxY)/2, (minX + maxX)/2]
     };
@@ -83,15 +92,17 @@ export default class Page extends React.Component {
     let data = this.incidentsYearLocation(this.state.domVioData);
     let incidentsPerLocation = data && data[this.state.displayYear] || {};
     let yearButtons = ["2015", "2016", "2017"].map(year => <input type="button" value={year} onClick={ ()=> this.setState({displayYear: year})} />)
-    let locationCenters = this.locations(this.state.domVioData) ;
+    let locationInfo = this.locationInfo(this.state.domVioData) ;
     let mapCoordinates = this.mapCoordinates(this.state.domVioData)
-    //let xx = this.state.domVioData.length > 0 ? this.state.domVioData[0].doc.properties: "";
-    //console.log(xx);
+
+    //uses color as marks. Blue = low # of violence, red = high.
     let palette = ColorInterpolate(['blue', 'yellow', 'red']);
+
+    //can switch between circle or rectangle indicators
     let circleMarkers = Object.keys(incidentsPerLocation).map(locationName =>
       <Circle
-        center={locationCenters[locationName].center}
-        radius={locationCenters[locationName].apprRadius*40000}
+        center={locationInfo[locationName].center}
+        radius={locationInfo[locationName].apprRadius*40000}
         color={incidentsPerLocation[locationName] < 5000? palette(incidentsPerLocation[locationName]/5000) : "#000000"}
         weight={1} opacity={0.5}>
         <Tooltip>{locationName}: {incidentsPerLocation[locationName]}</Tooltip>
@@ -99,7 +110,7 @@ export default class Page extends React.Component {
     )
     let rectMarkers = Object.keys(incidentsPerLocation).map(locationName =>
       <Rectangle
-        bounds={locationCenters[locationName].boundary}
+        bounds={locationInfo[locationName].boundary}
         color={incidentsPerLocation[locationName] < 5000? palette(incidentsPerLocation[locationName]/5000) : "#000000"}
         weight={1} opacity={0.5}>
         <Tooltip>{locationName}: {incidentsPerLocation[locationName]}</Tooltip>
@@ -118,13 +129,6 @@ export default class Page extends React.Component {
           />
           {this.state.useCircle? circleMarkers: rectMarkers}
         </Map>
-        /*<Map center={[51.505, -0.09]} zoom={13} style={{height:"500px"}}>
-          <TileLayer
-            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Circle center={[51.505, -0.09]} fillColor="blue" radius={200} />
-        </Map>*/
         :
         JSON.stringify(incidentsPerLocation)
       }
@@ -132,7 +136,7 @@ export default class Page extends React.Component {
   }
 }
 
-//I can't get this to work
+//I can't get server-side rendering to work, so for now I'm using client-side data fetching.
 /*export async function getStaticProps(){
   console.log("hi")
   let domViodata = await fetch("/api/domesticViolence");
