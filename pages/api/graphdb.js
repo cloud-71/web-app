@@ -6,7 +6,7 @@ export default async function (req, res) {
 
   if (req.method == 'GET') {
     const graphs = await db.list();
-    console.log(graphs);
+    //console.log(graphs);
     const result = graphs.rows;
     res.status(200).json(result);
   } else if (req.method == 'POST') {
