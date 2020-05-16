@@ -1,4 +1,4 @@
-import Nano from 'nano';
+import connection from './connection.js';
 
 async function graphDB(connection) {
   try {
@@ -9,12 +9,4 @@ async function graphDB(connection) {
   }
 }
 
-const connection = (function connect() {
-  const host = process.env['COUCHDB_HOST'] || 'localhost:5984';
-  const username = process.env['COUCHDB_USERNAME'] || 'admin';
-  const password = process.env['COUCHDB_PASSWORD'] || 'admin';
-  return Nano(`http://${username}:${password}@${host}`);
-})()
-
-export { connection };
 export default graphDB;
