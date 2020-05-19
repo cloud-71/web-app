@@ -23,6 +23,9 @@ export default class Page extends React.Component {
     //fetch domestic abuse data
     //dataset used is
     //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_lga_jul2013_jun2018
+
+    //use this for rates
+    //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_rate_lga_jul2013_jun2018
     let domVioData = await fetch('/api/domesticViolence');
     domVioData = await domVioData.json();
     //console.log(domVioData);
@@ -41,9 +44,9 @@ export default class Page extends React.Component {
     domVioData
       .map((d) => d.doc.properties)
       .forEach((d) => {
-        obj['2015'][d.lga_name11] = d.number_family_incidents_2015_16;
-        obj['2016'][d.lga_name11] = d.number_family_incidents_2016_17;
-        obj['2017'][d.lga_name11] = d.number_family_incidents_2017_18;
+        obj['2015'][d.lga_name11] = d.family_incident_rate_per_100k_2015_16;
+        obj['2016'][d.lga_name11] = d.family_incident_rate_per_100k_2016_17;
+        obj['2017'][d.lga_name11] = d.family_incident_rate_per_100k_2017_18;
       });
     return obj;
   }
@@ -130,7 +133,7 @@ export default class Page extends React.Component {
     let mapCoordinates = this.mapCoordinates(this.state.domVioData);
 
     //uses color as marks. Blue = low # of violence, red = high.
-    let palette = ColorInterpolate(['blue', 'yellow', 'red']);
+    let palette = ColorInterpolate(['blue', 'yellow', 'red', 'maroon']);
 
     //can switch between circle or rectangle indicators
     let circleMarkers = Object.keys(incidentsPerLocation).map(
@@ -170,7 +173,17 @@ export default class Page extends React.Component {
     ));
     let geoJSONMarkers = Object.keys(incidentsPerLocation).map(
       (locationName) => (
-        <GeoJSON data={geoJSONData[locationName]}>
+        //Spectrum is hard coded, had something to find maximum
+        <GeoJSON
+          data={geoJSONData[locationName]}
+          color={
+            incidentsPerLocation[locationName] < 4000
+              ? palette(incidentsPerLocation[locationName] / 4000)
+              : '#000000'
+          }
+          weight={1.5}
+          opacity={0.75}
+        >
           <Tooltip>
             {locationName}: {incidentsPerLocation[locationName]}
           </Tooltip>
@@ -183,7 +196,7 @@ export default class Page extends React.Component {
           {yearButtons}
           <input
             type="button"
-            value={this.state.useCircle ? 'Circle' : 'GeoJSON'}
+            value={this.state.useCircle ? 'GeoJSON' : 'Circle'}
             onClick={() =>
               this.setState((state) => ({ useCircle: !state.useCircle }))
             }
