@@ -1,4 +1,4 @@
-let ReactLeaflet, TileLayer, Map, Circle, Rectangle, Tooltip, GeoJSON;
+let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON;
 import ColorInterpolate from 'color-interpolate';
 
 export default class Page extends React.Component {
@@ -19,8 +19,6 @@ export default class Page extends React.Component {
     ReactLeaflet = await require('react-leaflet');
     Map = await ReactLeaflet.Map;
     TileLayer = await ReactLeaflet.TileLayer;
-    Circle = await ReactLeaflet.Circle;
-    Rectangle = await ReactLeaflet.Rectangle;
     Tooltip = await ReactLeaflet.Tooltip;
     GeoJSON = await ReactLeaflet.GeoJSON;
     this.forceUpdate();
@@ -36,8 +34,8 @@ export default class Page extends React.Component {
   }
 
   render() {
-    let data = this.state.domVioData;//this.incidentsYearLocation(this.state.domVioData);
-    let geoJSONData = this.state.geometryData;//this.GeoJSONData(this.state.domVioData);
+    let data = this.state.domVioData;
+    let geoJSONData = this.state.geometryData;
     let incidentsPerLocation = (data && data[this.state.displayYear]) || {};
     let yearButtons = ['2015-2016', '2016-2017', '2017-2018'].map((year) => (
       <input
@@ -46,7 +44,7 @@ export default class Page extends React.Component {
         onClick={() => this.setState({ displayYear: year })}
       />
     ));
-    let mapCoordinates = this.state.mapCoordinateData;//this.mapCoordinates(this.state.domVioData);
+    let mapCoordinates = this.state.mapCoordinateData;
 
     //uses color as marks. Blue = low # of violence, red = high.
     let palette = ColorInterpolate(['blue', 'yellow', 'red', 'maroon']);
