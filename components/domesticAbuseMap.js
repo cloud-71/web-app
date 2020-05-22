@@ -1,5 +1,8 @@
 let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON, Control;
 import ColorInterpolate from 'color-interpolate';
+import Card from 'react-bootstrap/Card';
+import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 
 export default class DomesticAbuseMap extends React.Component {
   constructor(props) {
@@ -21,20 +24,35 @@ export default class DomesticAbuseMap extends React.Component {
     this.forceUpdate();
   }
 
-  yearButton(year){
-    return  <input
-        type="button"
-        value={year}
-        onClick={() => this.setState({ displayYear: year })}
-      />
+  yearButtons(years){
+    let buttons =  years.map(year =>
+      <ToggleButton
+        variant="outline-secondary"
+        size="sm"
+        value={year}>
+        {year}
+      </ToggleButton>);
+
+    return <ToggleButtonGroup
+              className="float-right"
+              type="radio"
+              name="displayYear"
+              value={this.state.displayYear}
+              onChange={(value) => this.setState({displayYear: value})}>
+              {buttons}
+            </ToggleButtonGroup>
   }
 
   mapHeader(){
-    let yearButtons = ['2015-2016', '2016-2017', '2017-2018'].map(this.yearButton.bind(this));
+    let yearButtons = this.yearButtons(['2015-2016', '2016-2017', '2017-2018']);
     return Control ?
     <Control position="topright">
-      <h3>Rates of Domestic Violence in Victoria per every 100,000 population</h3>
-      <div>{yearButtons}</div>
+      <Card style={{width: '25rem'}}>
+        <Card.Body>
+          <Card.Title className="float-right">Rates of Domestic Violence in Victoria for Every 100,000 Population</Card.Title>
+          {yearButtons}
+        </Card.Body>
+      </Card>
     </Control>
     : <div/>
   }
