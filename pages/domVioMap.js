@@ -25,81 +25,14 @@ export default class Page extends React.Component {
     GeoJSON = await ReactLeaflet.GeoJSON;
     this.forceUpdate();
 
-    //fetch domestic abuse data
-    //use this for rates
-    //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_rate_lga_jul2013_jun2018
+    //fetch AURIN data
+    this.fetchAurinData();
+  }
+
+  async fetchAurinData(){
     let data = await fetch('/api/domesticViolence');
     data = await data.json();
-
-    /*let domVioData = {};
-    data.domVioData.forEach(d => {
-      domVioData[d.key[0]] = [];
-      domVioData[d.key[0]][d.key[1]] = d.value;
-    })
-    let geometryData = data.geometryData.reduce((obj, row) => obj[row.key] = row.value, {});
-    let mapCoordinateData = data.mapCoordinateData;*/
     this.setState({...data});
-  }
-
-  incidentsYearLocation(domVioData) {
-    //categorises number of domestic violence in each region in each year
-    if (domVioData == null || domVioData.length == 0) return {};
-
-    let obj = {
-      '2015': {},
-      '2016': {},
-      '2017': {},
-    };
-    domVioData
-      .map((d) => d.doc.properties)
-      .forEach((d) => {
-        obj['2015'][d.lga_name11] = d.family_incident_rate_per_100k_2015_16;
-        obj['2016'][d.lga_name11] = d.family_incident_rate_per_100k_2016_17;
-        obj['2017'][d.lga_name11] = d.family_incident_rate_per_100k_2017_18;
-      });
-    return obj;
-  }
-
-  GeoJSONData(domVioData) {
-    //categorises number of domestic violence in each region in each year
-    if (domVioData == null || domVioData.length == 0) return {};
-
-    let obj = {};
-    domVioData
-      .map((d) => d.doc)
-      .forEach((d) => {
-        obj[d.properties.lga_name11] = d.geometry;
-        //console.log(d);
-      });
-    return obj;
-  }
-
-  mapCoordinates(domVioData) {
-    //calculates the initial map boundaries
-    if (domVioData == null || domVioData.length == 0) return {};
-
-    let maxX = -9999999999999;
-    let maxY = -9999999999999;
-    let minX = 9999999999999;
-    let minY = 9999999999999;
-    domVioData
-      .map((d) => d.doc.properties)
-      .forEach((p) => {
-        minX = Math.min(minX, p.bbox[0]);
-        minY = Math.min(minY, p.bbox[1]);
-        maxX = Math.max(maxX, p.bbox[2]);
-        maxY = Math.max(maxY, p.bbox[3]);
-        //console.log(maxX + ',' + maxY + ',' + minX + ',' + minY);
-      });
-    let obj = {
-      //reverse indexes because AURIN data uses [long, lat], while leaflet needs [lat, long]
-      boundary: [
-        [minY, minX],
-        [maxY, maxX],
-      ],
-      center: [(minY + maxY) / 2, (minX + maxX) / 2],
-    };
-    return obj;
   }
 
   render() {
