@@ -4,7 +4,12 @@ import ColorInterpolate from 'color-interpolate';
 export default class Page extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { displayYear: '2015', domVioData: [], useCircle: true };
+    this.state = {
+      displayYear: '2015-2016',
+      domVioData: [],
+      geometryData: [],
+      mapCoordinateData: {}
+    };
   }
 
   async componentDidMount() {
@@ -21,15 +26,19 @@ export default class Page extends React.Component {
     this.forceUpdate();
 
     //fetch domestic abuse data
-    //dataset used is
-    //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_lga_jul2013_jun2018
-
     //use this for rates
     //VIC_Govt_CSA-UoM_AURIN_DB_csa_family_violence_family_incident_rate_lga_jul2013_jun2018
-    let domVioData = await fetch('/api/domesticViolence');
-    domVioData = await domVioData.json();
-    //console.log(domVioData);
-    this.setState({ domVioData });
+    let data = await fetch('/api/domesticViolence');
+    data = await data.json();
+
+    /*let domVioData = {};
+    data.domVioData.forEach(d => {
+      domVioData[d.key[0]] = [];
+      domVioData[d.key[0]][d.key[1]] = d.value;
+    })
+    let geometryData = data.geometryData.reduce((obj, row) => obj[row.key] = row.value, {});
+    let mapCoordinateData = data.mapCoordinateData;*/
+    this.setState({...data});
   }
 
   incidentsYearLocation(domVioData) {
@@ -94,17 +103,17 @@ export default class Page extends React.Component {
   }
 
   render() {
-    let data = this.incidentsYearLocation(this.state.domVioData);
-    let geoJSONData = this.GeoJSONData(this.state.domVioData);
+    let data = this.state.domVioData;//this.incidentsYearLocation(this.state.domVioData);
+    let geoJSONData = this.state.geometryData;//this.GeoJSONData(this.state.domVioData);
     let incidentsPerLocation = (data && data[this.state.displayYear]) || {};
-    let yearButtons = ['2015', '2016', '2017'].map((year) => (
+    let yearButtons = ['2015-2016', '2016-2017', '2017-2018'].map((year) => (
       <input
         type="button"
         value={year}
         onClick={() => this.setState({ displayYear: year })}
       />
     ));
-    let mapCoordinates = this.mapCoordinates(this.state.domVioData);
+    let mapCoordinates = this.state.mapCoordinateData;//this.mapCoordinates(this.state.domVioData);
 
     //uses color as marks. Blue = low # of violence, red = high.
     let palette = ColorInterpolate(['blue', 'yellow', 'red', 'maroon']);
