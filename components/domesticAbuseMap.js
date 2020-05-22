@@ -1,4 +1,4 @@
-let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON;
+let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON, Control;
 import ColorInterpolate from 'color-interpolate';
 
 export default class DomesticAbuseMap extends React.Component {
@@ -12,6 +12,7 @@ export default class DomesticAbuseMap extends React.Component {
     //you can't use import with ReactLeaflet because leaflet needs to be instantiated on client
     //while nextjs compiles the modules on server
     //This is a workaround
+    Control = await require('react-leaflet-control').default;
     ReactLeaflet = await require('react-leaflet');
     Map = await ReactLeaflet.Map;
     TileLayer = await ReactLeaflet.TileLayer;
@@ -26,6 +27,16 @@ export default class DomesticAbuseMap extends React.Component {
         value={year}
         onClick={() => this.setState({ displayYear: year })}
       />
+  }
+
+  mapHeader(){
+    let yearButtons = ['2015-2016', '2016-2017', '2017-2018'].map(this.yearButton.bind(this));
+    return Control ?
+    <Control position="topright">
+      <h3>Rates of Domestic Violence in Victoria per every 100,000 population</h3>
+      <div>{yearButtons}</div>
+    </Control>
+    : <div/>
   }
 
   geoJSONMarkers(){
@@ -60,15 +71,12 @@ export default class DomesticAbuseMap extends React.Component {
   }
 
   render() {
-    let yearButtons = ['2015-2016', '2016-2017', '2017-2018'].map(this.yearButton);
+    let header = this.mapHeader();
     let mapCoordinates = this.props.mapCoordinateData || {};
     let geoJSONMarkers = this.geoJSONMarkers();
 
     return (
       <div>
-        <div>
-          {yearButtons}
-        </div>
         {Map ? (
           <Map
             maxBounds={mapCoordinates.boundary}
@@ -80,6 +88,7 @@ export default class DomesticAbuseMap extends React.Component {
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            {header}
             {geoJSONMarkers}
           </Map>
         ) : (
