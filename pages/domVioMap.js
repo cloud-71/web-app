@@ -65,31 +65,6 @@ export default class Page extends React.Component {
     return obj;
   }
 
-  locationInfo(domVioData) {
-    //formats region coordinates informations
-    if (domVioData == null || domVioData.length == 0) return {};
-
-    let obj = {};
-    domVioData
-      .map((d) => d.doc.properties)
-      .forEach(
-        (p) =>
-          (obj[p.lga_name11] = {
-            //reverse because AURIN data uses [long, lat], while leaflet needs [lat, long]
-            center: [(p.bbox[1] + p.bbox[3]) / 2, (p.bbox[0] + p.bbox[2]) / 2],
-            boundary: [
-              [p.bbox[1], p.bbox[0]],
-              [p.bbox[3], p.bbox[2]],
-            ],
-            apprRadius:
-              (Math.abs(p.bbox[0] - p.bbox[2]) +
-                Math.abs(p.bbox[1] - p.bbox[3])) /
-              2,
-          }),
-      );
-    return obj;
-  }
-
   mapCoordinates(domVioData) {
     //calculates the initial map boundaries
     if (domVioData == null || domVioData.length == 0) return {};
@@ -129,48 +104,11 @@ export default class Page extends React.Component {
         onClick={() => this.setState({ displayYear: year })}
       />
     ));
-    let locationInfo = this.locationInfo(this.state.domVioData);
     let mapCoordinates = this.mapCoordinates(this.state.domVioData);
 
     //uses color as marks. Blue = low # of violence, red = high.
     let palette = ColorInterpolate(['blue', 'yellow', 'red', 'maroon']);
 
-    //can switch between circle or rectangle indicators
-    let circleMarkers = Object.keys(incidentsPerLocation).map(
-      (locationName) => (
-        <Circle
-          center={locationInfo[locationName].center}
-          radius={locationInfo[locationName].apprRadius * 40000}
-          color={
-            incidentsPerLocation[locationName] < 5000
-              ? palette(incidentsPerLocation[locationName] / 5000)
-              : '#000000'
-          }
-          weight={1}
-          opacity={0.5}
-        >
-          <Tooltip>
-            {locationName}: {incidentsPerLocation[locationName]}
-          </Tooltip>
-        </Circle>
-      ),
-    );
-    let rectMarkers = Object.keys(incidentsPerLocation).map((locationName) => (
-      <Rectangle
-        bounds={locationInfo[locationName].boundary}
-        color={
-          incidentsPerLocation[locationName] < 5000
-            ? palette(incidentsPerLocation[locationName] / 5000)
-            : '#000000'
-        }
-        weight={1}
-        opacity={0.5}
-      >
-        <Tooltip>
-          {locationName}: {incidentsPerLocation[locationName]}
-        </Tooltip>
-      </Rectangle>
-    ));
     let geoJSONMarkers = Object.keys(incidentsPerLocation).map(
       (locationName) => (
         //Spectrum is hard coded, had something to find maximum
@@ -194,13 +132,6 @@ export default class Page extends React.Component {
       <div>
         <div>
           {yearButtons}
-          <input
-            type="button"
-            value={this.state.useCircle ? 'GeoJSON' : 'Circle'}
-            onClick={() =>
-              this.setState((state) => ({ useCircle: !state.useCircle }))
-            }
-          />
         </div>
         {Map ? (
           <Map
@@ -213,7 +144,7 @@ export default class Page extends React.Component {
               attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {this.state.useCircle ? circleMarkers : geoJSONMarkers}
+            {geoJSONMarkers}
           </Map>
         ) : (
           JSON.stringify(incidentsPerLocation)
