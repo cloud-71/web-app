@@ -1,9 +1,8 @@
 import connection from './connection.js';
 
-async function graphDB(connection) {
-  console.log(process.env['COUCHDB_DATABASE_AURIN']);
+async function twitterDB(connection) {
   const database_name =
-    process.env['COUCHDB_DATABASE_AURIN'] || 'domestic_violence_vic';
+    process.env['COUCHDB_DATABASE_TWITTER'] || 'twitter_test';
   try {
     await connection.db.create(database_name);
     return connection.use(database_name);
@@ -12,4 +11,4 @@ async function graphDB(connection) {
   }
 }
 
-export default graphDB;
+export default twitterDB;
