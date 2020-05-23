@@ -1,0 +1,16 @@
+{
+  "_id": "_design/views",
+  "views": {
+    "year-location-view": {
+      "map": "function (doc) {\n  emit(['2015-2016', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2015_16);\n  emit(['2016-2017', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2016_17);\n  emit(['2017-2018', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2017_18);\n}"
+    },
+    "map-coordinate-view": {
+      "reduce": "function (keys, values, rereduce) {\n  if (!rereduce){\n    values = values.map(bbox => ({\n      minLat: bbox[1],\n      maxLat: bbox[3],\n      minLong: bbox[0],\n      maxLong: bbox[2]\n    }));\n  }\n  \n  var minLat = values.reduce(function(a, b) { return Math.min(a, b.minLat) }, Infinity);\n  var maxLat = values.reduce(function(a, b) { return Math.max(a, b.maxLat) }, -Infinity);\n  var minLong = values.reduce(function(a, b) { return Math.min(a, b.minLong) }, Infinity);\n  var maxLong = values.reduce(function(a, b) { return Math.max(a, b.maxLong) }, -Infinity);\n  var center = [(minLat+maxLat)/2, (minLong+maxLong)/2];\n  var boundary = [[minLat, minLong], [maxLat, maxLong]];\n  return {minLat, maxLat, minLong, maxLong, center, boundary}\n}",
+      "map": "function (doc) {\n  emit(doc._id, doc.properties.bbox);\n}"
+    },
+    "geometry-view": {
+      "map": "function (doc) {\n  emit(doc.properties.lga_name11, doc.geometry);\n}"
+    }
+  },
+  "language": "javascript"
+}
