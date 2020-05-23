@@ -35,10 +35,10 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let data = await fetch('/api/twitterDBapi');
-    console.log(data);
-    data = await data.json();
-    this.setState({ data });
+    let twitterData = await fetch('/api/twitterDBapi');
+    console.log(twitterData);
+    twitterData = await twitterData.json();
+    this.setState({ twitterData });
     this.setState({ loading: false });
   }
 
