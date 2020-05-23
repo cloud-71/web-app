@@ -1,11 +1,14 @@
 import connection from './connection.js';
 
 async function graphDB(connection) {
+  console.log(process.env['COUCHDB_DATABASE_AURIN']);
+  const database_name =
+    process.env['COUCHDB_DATABASE_AURIN'] || 'domestic_violence_vic';
   try {
-    await connection.db.create('domestic_violence_vic');
-    return connection.use('domestic_violence_vic');
+    await connection.db.create(database_name);
+    return connection.use(database_name);
   } catch {
-    return connection.use('domestic_violence_vic');
+    return connection.use(database_name);
   }
 }
 
