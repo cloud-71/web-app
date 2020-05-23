@@ -1,11 +1,13 @@
 import connection from './connection.js';
 
 async function twitterDB(connection) {
+  const database_name =
+    process.env['COUCHDB_DATABASE_TWITTER'] || 'twitter_test';
   try {
-    await connection.db.create('twitter_test');
-    return connection.use('twitter_test');
+    await connection.db.create(database_name);
+    return connection.use(database_name);
   } catch {
-    return connection.use('twitter_test');
+    return connection.use(database_name);
   }
 }
 
