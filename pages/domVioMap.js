@@ -5,7 +5,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-
 export default class Page extends React.Component {
   constructor(props) {
     super(props);
@@ -16,6 +15,7 @@ export default class Page extends React.Component {
     };
     this.mapRef = React.createRef();
     this.graphRef = React.createRef();
+    this.cloudRef = React.createRef();
   }
 
   async componentDidMount() {
@@ -42,7 +42,9 @@ export default class Page extends React.Component {
   }
 
   scrollTo(element) {
-    let ref = element == 'map' ? this.mapRef : this.graphRef;
+    let ref = this.mapRef;
+    if (element == 'graph') ref = this.graphRef;
+    if (element == 'word-cloud') ref = this.cloudRef;
     ref.current.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -61,25 +63,33 @@ export default class Page extends React.Component {
           <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
             Graphs
           </Nav.Link>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('word-cloud')}>
+            Word Cloud
+          </Nav.Link>
         </Navbar>
         <Container fluid>
           <Row ref={this.mapRef}>
             <Col>
-                <h3>Map</h3>
-                <DomesticAbuseMap
-                  height={'500px'}
-                  loading={this.state.loading}
-                  domVioData={this.state.data.domVioData}
-                  geometryData={this.state.data.geometryData}
-                  mapCoordinateData={this.state.data.mapCoordinateData}
-                  twitterData={this.state.twitterData}
-                />
+              <h3>Map</h3>
+              <DomesticAbuseMap
+                height={'500px'}
+                loading={this.state.loading}
+                domVioData={this.state.data.domVioData}
+                geometryData={this.state.data.geometryData}
+                mapCoordinateData={this.state.data.mapCoordinateData}
+                twitterData={this.state.twitterData}
+              />
             </Col>
           </Row>
           <Row ref={this.graphRef}>
             <Col>
               <h3>Graphs</h3>
               <div style={{ height: '1000px' }}></div>
+            </Col>
+          </Row>
+          <Row ref={this.cloudRef}>
+            <Col>
+              <h3>Word Cloud</h3>
             </Col>
           </Row>
         </Container>
