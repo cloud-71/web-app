@@ -4,8 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Jumbotron from 'react-bootstrap/Jumbotron';
-import Spinner from 'react-bootstrap/Spinner';
+
 
 export default class Page extends React.Component {
   constructor(props) {
@@ -66,27 +65,20 @@ export default class Page extends React.Component {
         <Container fluid>
           <Row ref={this.mapRef}>
             <Col>
-              {this.state.loading || !this.state.data ? (
-                <Jumbotron fluid style={{ height: '500px' }}>
-                  <Spinner
-                    animation="border"
-                    variant="dark"
-                    style={{ top: '50%', right: '50%', position: 'absolute' }}
-                  />
-                </Jumbotron>
-              ) : (
+                <h3>Map</h3>
                 <DomesticAbuseMap
+                  height={'500px'}
+                  loading={this.state.loading}
                   domVioData={this.state.data.domVioData}
                   geometryData={this.state.data.geometryData}
                   mapCoordinateData={this.state.data.mapCoordinateData}
                   twitterData={this.state.twitterData}
                 />
-              )}
             </Col>
           </Row>
           <Row ref={this.graphRef}>
             <Col>
-              Graphs
+              <h3>Graphs</h3>
               <div style={{ height: '1000px' }}></div>
             </Col>
           </Row>

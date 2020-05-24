@@ -3,10 +3,12 @@ import ColorInterpolate from 'color-interpolate';
 import Card from 'react-bootstrap/Card';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+import Jumbotron from 'react-bootstrap/Jumbotron';
+import Spinner from 'react-bootstrap/Spinner';
 
 export default class DomesticAbuseMap extends React.Component {
   constructor(props) {
-    //props: domVioData, geometryData, mapCoordinateData
+    //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, height
     super(props);
     this.state = { displayYear: '2015-2016' };
   }
@@ -28,7 +30,7 @@ export default class DomesticAbuseMap extends React.Component {
 
   yearButtons(years) {
     let buttons = years.map((year) => (
-      <ToggleButton variant="outline-secondary" size="sm" value={year}>
+      <ToggleButton variant="outline-secondary" size="sm" value={year} key={year}>
         {year}
       </ToggleButton>
     ));
@@ -132,32 +134,51 @@ export default class DomesticAbuseMap extends React.Component {
     ));
   }
 
-  render() {
+  mapComponent() {
     let header = this.mapHeader();
     let mapCoordinates = this.props.mapCoordinateData || {};
     let geoJSONMarkers = this.geoJSONMarkers();
     let tweetMarkers = this.twitterMarkers();
 
     return (
+      <Map
+        maxBounds={mapCoordinates.boundary}
+        center={mapCoordinates.center}
+        zoom={7}
+        style={{ height: this.props.height }}
+      >
+        <TileLayer
+          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {header}
+        {geoJSONMarkers}
+        {tweetMarkers}
+      </Map>
+    );
+  }
+
+  loadingComponent(){
+    return (
+      <Jumbotron fluid style={{ height: this.props.height }}>
+        <Spinner
+          animation="border"
+          variant="dark"
+          style={{ top: '50%', right: '50%', position: 'absolute' }}
+        />
+      </Jumbotron>
+    )
+  }
+
+  render() {
+
+
+    return (
       <div>
-        {Map ? (
-          <Map
-            maxBounds={mapCoordinates.boundary}
-            center={mapCoordinates.center}
-            zoom={7}
-            style={{ height: '500px' }}
-          >
-            <TileLayer
-              attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {header}
-            {geoJSONMarkers}
-            {tweetMarkers}
-          </Map>
-        ) : (
-          'Now Loading'
-        )}
+        {Map && !this.props.loading ?
+          this.mapComponent() :
+          this.loadingComponent()
+        }
       </div>
     );
   }
