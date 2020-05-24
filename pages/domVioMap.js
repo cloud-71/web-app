@@ -1,4 +1,5 @@
 import DomesticAbuseMap from '../components/domesticAbuseMap.js';
+import SimpleCloud from '../components/simple-cloud';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
@@ -90,6 +91,7 @@ export default class Page extends React.Component {
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
+              <SimpleCloud></SimpleCloud>
             </Col>
           </Row>
         </Container>
