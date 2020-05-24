@@ -5,7 +5,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-
 export default class Page extends React.Component {
   constructor(props) {
     super(props);
@@ -27,26 +26,35 @@ export default class Page extends React.Component {
 
   async fetchAurinData() {
     //define an async function to fetch domestic violence data
-    let fetchDomVioData = async function(){
+    let fetchDomVioData = async function () {
       let domVioData = await fetch('/api/domesticViolence/year-location-view');
       domVioData = await domVioData.json();
       this.setState({ domVioData });
-    }.bind(this)
+    }.bind(this);
 
     //define an async function to fetch map data
-    let fetchMapData = async function(){
+    let fetchMapData = async function () {
       //use promises instead of async/await for concurrent fetching
-      let geoPromise = fetch('/api/domesticViolence/mapGeometry').then(geodata => geodata.json());
-      let coordPromise = fetch('/api/domesticViolence/mapCoordinate').then(coordata => coordata.json());
+      let geoPromise = fetch(
+        '/api/domesticViolence/mapGeometry',
+      ).then((geodata) => geodata.json());
+      let coordPromise = fetch(
+        '/api/domesticViolence/mapCoordinate',
+      ).then((coordata) => coordata.json());
       //set state when both fetching are complete
-      Promise.all([geoPromise, coordPromise])
-            .then(([geometryData, mapCoordinateData]) => this.setState({mapData: {geometryData, mapCoordinateData}}));
+      Promise.all([
+        geoPromise,
+        coordPromise,
+      ]).then(([geometryData, mapCoordinateData]) =>
+        this.setState({ mapData: { geometryData, mapCoordinateData } }),
+      );
     }.bind(this);
 
     this.setState({ loading: true });
     //run the fetching async functions, then when they're all completed set loading to false
-    Promise.all([fetchDomVioData(), fetchMapData()])
-        .then(() => this.setState({loading: false}));
+    Promise.all([fetchDomVioData(), fetchMapData()]).then(() =>
+      this.setState({ loading: false }),
+    );
 
     //old fetching
     /*let data = await fetch('/api/domesticViolence');
@@ -88,15 +96,15 @@ export default class Page extends React.Component {
         <Container fluid>
           <Row ref={this.mapRef}>
             <Col>
-                <h3>Map</h3>
-                <DomesticAbuseMap
-                  height={'500px'}
-                  loading={this.state.loading}
-                  domVioData={this.state.domVioData}
-                  geometryData={this.state.mapData.geometryData}
-                  mapCoordinateData={this.state.mapData.mapCoordinateData}
-                  twitterData={this.state.twitterData}
-                />
+              <h3>Map</h3>
+              <DomesticAbuseMap
+                height={'500px'}
+                loading={this.state.loading}
+                domVioData={this.state.domVioData}
+                geometryData={this.state.mapData.geometryData}
+                mapCoordinateData={this.state.mapData.mapCoordinateData}
+                twitterData={this.state.twitterData}
+              />
             </Col>
           </Row>
           <Row ref={this.graphRef}>

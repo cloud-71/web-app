@@ -1,13 +1,15 @@
 import DomVioMap from './domVioMap.js';
 
 export default class MainIndex extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
 
-  render(){
-    return (<div>
-      <DomVioMap />
-    </div>)
+  render() {
+    return (
+      <div>
+        <DomVioMap />
+      </div>
+    );
   }
 }
