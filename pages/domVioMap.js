@@ -1,4 +1,5 @@
 import DomesticAbuseMap from '../components/domesticAbuseMap.js';
+import DomesticAbuseGraphs from '../components/domesticAbuseGraphs.js';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
@@ -33,6 +34,12 @@ export default class Page extends React.Component {
       domVioData = await domVioData.json();
       this.setState({ domVioData });
     }.bind(this);
+    //define an async function to fetch domestic violence data, this is for the graphs
+    let fetchDomVioDataGraph = async function () {
+      let domVioDataGraph = await fetch('/api/domesticViolence/location-year-view');
+      domVioDataGraph = await domVioDataGraph.json();
+      this.setState({ domVioDataGraph });
+    }.bind(this);
 
     //define an async function to fetch map data
     let fetchMapData = async function () {
@@ -54,7 +61,7 @@ export default class Page extends React.Component {
 
     this.setState({ loading: true });
     //run the fetching async functions, then when they're all completed set loading to false
-    Promise.all([fetchDomVioData(), fetchMapData()]).then(() =>
+    Promise.all([fetchDomVioData(), fetchDomVioDataGraph(), fetchMapData()]).then(() =>
       this.setState({ loading: false }),
     );
 
@@ -129,7 +136,10 @@ export default class Page extends React.Component {
           <Row ref={this.graphRef}>
             <Col>
               <h3>Graphs</h3>
-              <div style={{ height: '1000px' }}></div>
+              <DomesticAbuseGraphs
+                domVioData={this.state.domVioDataGraph}
+                loading={this.state.loading}
+              />
             </Col>
           </Row>
         </Container>
