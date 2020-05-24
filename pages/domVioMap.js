@@ -28,6 +28,7 @@ export default class Page extends React.Component {
   async fetchAurinData() {
     this.setState({ loading: true });
     let data = await fetch('/api/domesticViolence');
+    console.log(data);
     data = await data.json();
     this.setState({ data });
     this.setState({ loading: false });
@@ -36,8 +37,8 @@ export default class Page extends React.Component {
   async fetchTweetData() {
     this.setState({ loading: true });
     let twitterData = await fetch('/api/twitterDBapi');
-    console.log(twitterData);
     twitterData = await twitterData.json();
+    console.log(twitterData.wordCount);
     this.setState({ twitterData });
     this.setState({ loading: false });
   }
@@ -78,7 +79,7 @@ export default class Page extends React.Component {
                 domVioData={this.state.data.domVioData}
                 geometryData={this.state.data.geometryData}
                 mapCoordinateData={this.state.data.mapCoordinateData}
-                twitterData={this.state.twitterData}
+                twitterData={this.state.twitterData.twitterData}
               />
             </Col>
           </Row>
