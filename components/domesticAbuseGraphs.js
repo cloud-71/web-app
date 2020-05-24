@@ -18,22 +18,13 @@ export default class DomesticAbuseGraphs extends React.Component {
     if (data == null)
       return;
 
-    let cards = Object.keys(data).map(locationName => {
-      return <Card key={locationName}>
-        <Card.Body>
+    let cols = Object.keys(data).map(locationName => {
+      return <Col lg={4} md={3} sm={2} xs={1}>
           <Card.Title>{locationName}</Card.Title>
           <DomesticAbuseGraph data={data[locationName]} />
-        </Card.Body>
-      </Card>
+        </Col>
     })
-
-    let cardGroups = [];
-    for (let i = 0; i < cards.length; i+=3){
-      let includedCards = cards.slice(i, i+3);
-      let cardGroup = <CardGroup>{includedCards}</CardGroup>
-      cardGroups.push(cardGroup);
-    }
-    return cardGroups;
+    return cols;
   }
 
   render(){
