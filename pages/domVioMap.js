@@ -10,7 +10,8 @@ export default class Page extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {},
+      mapData: {},
+      domVioData: {},
       twitterData: [],
       loading: false,
     };
@@ -25,11 +26,33 @@ export default class Page extends React.Component {
   }
 
   async fetchAurinData() {
+    //define an async function to fetch domestic violence data
+    let fetchDomVioData = async function(){
+      let domVioData = await fetch('/api/domesticViolence/year-location-view');
+      domVioData = await domVioData.json();
+      this.setState({ domVioData });
+    }.bind(this)
+
+    //define an async function to fetch map data
+    let fetchMapData = async function(){
+      //use promises instead of async/await for concurrent fetching
+      let geoPromise = fetch('/api/domesticViolence/mapGeometry').then(geodata => geodata.json());
+      let coordPromise = fetch('/api/domesticViolence/mapCoordinate').then(coordata => coordata.json());
+      //set state when both fetching are complete
+      Promise.all([geoPromise, coordPromise])
+            .then(([geometryData, mapCoordinateData]) => this.setState({mapData: {geometryData, mapCoordinateData}}));
+    }.bind(this);
+
     this.setState({ loading: true });
-    let data = await fetch('/api/domesticViolence');
+    //run the fetching async functions, then when they're all completed set loading to false
+    Promise.all([fetchDomVioData(), fetchMapData()])
+        .then(() => this.setState({loading: false}));
+
+    //old fetching
+    /*let data = await fetch('/api/domesticViolence');
     data = await data.json();
-    this.setState({ data });
-    this.setState({ loading: false });
+    this.setState({ ...data });
+    this.setState({ loading: false });*/
   }
 
   async fetchTweetData() {
@@ -69,9 +92,9 @@ export default class Page extends React.Component {
                 <DomesticAbuseMap
                   height={'500px'}
                   loading={this.state.loading}
-                  domVioData={this.state.data.domVioData}
-                  geometryData={this.state.data.geometryData}
-                  mapCoordinateData={this.state.data.mapCoordinateData}
+                  domVioData={this.state.domVioData}
+                  geometryData={this.state.mapData.geometryData}
+                  mapCoordinateData={this.state.mapData.mapCoordinateData}
                   twitterData={this.state.twitterData}
                 />
             </Col>
