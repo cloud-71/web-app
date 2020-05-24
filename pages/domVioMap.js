@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Jumbotron from 'react-bootstrap/Jumbotron';
 
 export default class Page extends React.Component {
   constructor(props) {
@@ -16,6 +17,7 @@ export default class Page extends React.Component {
     };
     this.mapRef = React.createRef();
     this.graphRef = React.createRef();
+    this.homeRef = React.createRef();
   }
 
   async componentDidMount() {
@@ -73,7 +75,12 @@ export default class Page extends React.Component {
   }
 
   scrollTo(element) {
-    let ref = element == 'map' ? this.mapRef : this.graphRef;
+    let refs = {
+      map: this.mapRef,
+      home: this.homeRef,
+      graph: this.graphRef,
+    };
+    let ref = refs[element];
     ref.current.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -86,6 +93,9 @@ export default class Page extends React.Component {
       <>
         <Navbar sticky="top" variant="dark" bg="dark">
           <Navbar.Brand>Group 71</Navbar.Brand>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('home')}>
+            Home
+          </Nav.Link>
           <Nav.Link href="#" onSelect={() => this.scrollTo('map')}>
             Map
           </Nav.Link>
@@ -94,6 +104,15 @@ export default class Page extends React.Component {
           </Nav.Link>
         </Navbar>
         <Container fluid>
+          <Row ref={this.homeRef}>
+            <Col>
+              <Jumbotron>
+                <h1>COMP90024 Cluster and Cloud Computing</h1>
+                <p>Placeholder text</p>
+                <p>Lorem ipsum dolor sit amet I forgot the rest</p>
+              </Jumbotron>
+            </Col>
+          </Row>
           <Row ref={this.mapRef}>
             <Col>
               <h3>Map</h3>
