@@ -142,6 +142,7 @@ export default class Page extends React.Component {
               <div>
                 <WordCloud data={this.state.twitterData.wordCount} topK={60} />
               </div>
+              <br></br>
             </Col>
             <Col></Col>
           </Row>
