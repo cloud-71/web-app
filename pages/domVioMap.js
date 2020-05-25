@@ -160,15 +160,10 @@ export default class Page extends React.Component {
             <Col>
               <h3>Word Cloud</h3>
               <p>Contains tweets that mention domestic violence</p>
+              <br></br>
               <div>
                 <WordCloud data={this.state.twitterData.wordCount} topK={60} />
               </div>
-              <style jsx>{`
-                div {
-                  border-style: solid;
-                  border-width: 10px;
-                }
-              `}</style>
             </Col>
             <Col></Col>
           </Row>

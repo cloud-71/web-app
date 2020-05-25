@@ -22,6 +22,24 @@ const data = [
   { value: 'NPM', count: 11 },
 ];
 
+// custom renderer is function which has tag, computed font size and
+// color as arguments, and returns react component which represents tag
+const customRenderer = (tag, size, color) => (
+  <span
+    key={tag.value}
+    style={{
+      transform: `rotate(${Math.random() * 90}deg)`,
+      fontSize: `${size / 2}em`,
+      margin: `'7px'`,
+      padding: '7px',
+      display: 'inline-block',
+      color: 'black',
+    }}
+  >
+    {tag.value}
+  </span>
+);
+
 // minSize, maxSize - font size in px
 // tags - array of objects with properties value and count
 // shuffle - indicates if data should be shuffled (true by default)
@@ -33,8 +51,8 @@ export default class WordCloud extends React.Component {
 
   compare(a, b) {
     // Use toUpperCase() to ignore character casing
-    const valueA = a.value;
-    const valueB = b.value;
+    const valueA = a.count;
+    const valueB = b.count;
 
     let comparison = 0;
     if (valueA > valueB) {
@@ -65,8 +83,9 @@ export default class WordCloud extends React.Component {
     }
     return (
       <TagCloud
-        minSize={13}
-        maxSize={35}
+        minSize={1}
+        maxSize={5}
+        renderer={customRenderer}
         tags={this.prepareData(this.props.data)}
         className="simple-cloud"
       />
