@@ -4,30 +4,30 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import CardGroup from 'react-bootstrap/CardGroup';
-import DomesticAbuseGraph from './DomesticAbuseGraph';
+import DomesticAbuseGraph from './domesticAbuseGraph';
 
 export default class DomesticAbuseGraphs extends React.Component {
-  constructor(props){
+  constructor(props) {
     //props: domVioData, loading
     super(props);
     this.state = {}
   }
 
-  graphs(){
+  graphs() {
     let data = this.props.domVioData;
     if (data == null)
       return;
 
     let cols = Object.keys(data).map(locationName => {
       return <Col lg={4} md={3} sm={2} xs={1}>
-          <Card.Title>{locationName}</Card.Title>
-          <DomesticAbuseGraph data={data[locationName]} />
-        </Col>
+        <Card.Title>{locationName}</Card.Title>
+        <DomesticAbuseGraph data={data[locationName]} />
+      </Col>
     })
     return cols;
   }
 
-  render(){
+  render() {
     let graphs = this.graphs();
 
     return (<>
@@ -38,7 +38,7 @@ export default class DomesticAbuseGraphs extends React.Component {
       </Row>
       <Row>
         {!this.props.loading ?
-          graphs:
+          graphs :
           ""}
       </Row>
     </>)

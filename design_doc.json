@@ -1,6 +1,5 @@
 {
   "_id": "_design/views",
-  "_rev": "22-53f727931bc1c16e3830c1f341a49328",
   "views": {
     "year-location-view": {
       "map": "function (doc) {\n  emit(['2015-2016', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2015_16);\n  emit(['2016-2017', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2016_17);\n  emit(['2017-2018', doc.properties.lga_name11], doc.properties.family_incident_rate_per_100k_2017_18);\n}"
