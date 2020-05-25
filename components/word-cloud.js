@@ -22,11 +22,7 @@ const data = [
   { value: 'NPM', count: 11 },
 ];
 
-/* CSS:
-.simple-cloud .tag-cloud-tag {
-  cursor: pointer;
-}
-*/
+
 
 // minSize, maxSize - font size in px
 // tags - array of objects with properties value and count
@@ -57,7 +53,7 @@ export default class WordCloud extends React.Component {
     }
     return (
       <TagCloud
-        minSize={12}
+        minSize={13}
         maxSize={35}
         tags={this.prepareData(this.props.data)}
         className="simple-cloud"

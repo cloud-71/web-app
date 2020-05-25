@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Jumbotron from 'react-bootstrap/Jumbotron';
+import styles from '../components/word-cloud.module.css'
 
 export default class Page extends React.Component {
   constructor(props) {
@@ -151,7 +152,10 @@ export default class Page extends React.Component {
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
-              <WordCloud data={this.state.twitterData.wordCount}></WordCloud>
+              <WordCloud data={this.state.twitterData.wordCount}
+                className={styles.default}></WordCloud>
+            </Col>
+            <Col>
             </Col>
           </Row>
         </Container>
