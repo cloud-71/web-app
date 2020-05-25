@@ -26,7 +26,9 @@ export default class DomesticAbuseMap extends React.Component {
     GeoJSON = await ReactLeaflet.GeoJSON;
     Marker = await ReactLeaflet.Marker;
     Popup = await ReactLeaflet.Popup;
-  
+    //marker icons don't show up unless you do this
+    L = await require('leaflet');
+    L.Icon.Default.imagePath='/'
     this.forceUpdate();
   }
 
