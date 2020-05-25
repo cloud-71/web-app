@@ -22,8 +22,6 @@ const data = [
   { value: 'NPM', count: 11 },
 ];
 
-
-
 // minSize, maxSize - font size in px
 // tags - array of objects with properties value and count
 // shuffle - indicates if data should be shuffled (true by default)
@@ -31,6 +29,20 @@ const data = [
 export default class WordCloud extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  compare(a, b) {
+    // Use toUpperCase() to ignore character casing
+    const valueA = a.value;
+    const valueB = b.value;
+
+    let comparison = 0;
+    if (valueA > valueB) {
+      comparison = 1;
+    } else if (valueA < valueB) {
+      comparison = -1;
+    }
+    return comparison;
   }
 
   prepareData(counts) {
@@ -41,7 +53,7 @@ export default class WordCloud extends React.Component {
         count: counts[i].value,
       };
     }
-    return test;
+    return test.sort(this.compare).slice(0, this.props.topK);
   }
 
   render() {
