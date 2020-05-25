@@ -7,7 +7,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Jumbotron from 'react-bootstrap/Jumbotron';
-import styles from '../components/word-cloud.module.css'
 
 export default class Page extends React.Component {
   constructor(props) {
@@ -39,7 +38,9 @@ export default class Page extends React.Component {
     }.bind(this);
     //define an async function to fetch domestic violence data, this is for the graphs
     let fetchDomVioDataGraph = async function () {
-      let domVioDataGraph = await fetch('/api/domesticViolence/location-year-view');
+      let domVioDataGraph = await fetch(
+        '/api/domesticViolence/location-year-view',
+      );
       domVioDataGraph = await domVioDataGraph.json();
       this.setState({ domVioDataGraph });
     }.bind(this);
@@ -64,9 +65,11 @@ export default class Page extends React.Component {
 
     this.setState({ loading: true });
     //run the fetching async functions, then when they're all completed set loading to false
-    Promise.all([fetchDomVioData(), fetchDomVioDataGraph(), fetchMapData()]).then(() =>
-      this.setState({ loading: false }),
-    );
+    Promise.all([
+      fetchDomVioData(),
+      fetchDomVioDataGraph(),
+      fetchMapData(),
+    ]).then(() => this.setState({ loading: false }));
 
     //old fetching
     /*let data = await fetch('/api/domesticViolence');
@@ -89,7 +92,7 @@ export default class Page extends React.Component {
       map: this.mapRef,
       home: this.homeRef,
       graph: this.graphRef,
-      cloud: this.cloudRef
+      cloud: this.cloudRef,
     };
     let ref = refs[element];
     ref.current.scrollIntoView({
@@ -153,11 +156,17 @@ export default class Page extends React.Component {
             <Col>
               <h3>Word Cloud</h3>
               <p>Contains tweets that mention domestic violence</p>
-              <WordCloud data={this.state.twitterData.wordCount}
-                className={styles.default}></WordCloud>
+              <div>
+                <WordCloud data={this.state.twitterData.wordCount} />
+              </div>
+              <style jsx>{`
+                div {
+                  border-style: solid;
+                  border-width: 10px;
+                }
+              `}</style>
             </Col>
-            <Col>
-            </Col>
+            <Col></Col>
           </Row>
         </Container>
       </>
