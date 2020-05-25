@@ -30,7 +30,12 @@ export default class DomesticAbuseMap extends React.Component {
 
   yearButtons(years) {
     let buttons = years.map((year) => (
-      <ToggleButton variant="outline-secondary" size="sm" value={year} key={year}>
+      <ToggleButton
+        variant="outline-secondary"
+        size="sm"
+        value={year}
+        key={year}
+      >
         {year}
       </ToggleButton>
     ));
@@ -158,7 +163,7 @@ export default class DomesticAbuseMap extends React.Component {
     );
   }
 
-  loadingComponent(){
+  loadingComponent() {
     return (
       <Jumbotron fluid style={{ height: this.props.height }}>
         <Spinner
@@ -167,18 +172,15 @@ export default class DomesticAbuseMap extends React.Component {
           style={{ top: '50%', right: '50%', position: 'absolute' }}
         />
       </Jumbotron>
-    )
+    );
   }
 
   render() {
-
-
     return (
       <div>
-        {Map && !this.props.loading ?
-          this.mapComponent() :
-          this.loadingComponent()
-        }
+        {Map && !this.props.loading
+          ? this.mapComponent()
+          : this.loadingComponent()}
       </div>
     );
   }

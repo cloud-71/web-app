@@ -10,6 +10,9 @@
     },
     "geometry-view": {
       "map": "function (doc) {\n  emit(doc.properties.lga_name11, doc.geometry);\n}"
+    },
+    "location-year-view": {
+      "map": "function (doc) {\n  emit([doc.properties.lga_name11, '2015-2016'], doc.properties.family_incident_rate_per_100k_2015_16);\n  emit([doc.properties.lga_name11, '2016-2017'], doc.properties.family_incident_rate_per_100k_2016_17);\n  emit([doc.properties.lga_name11, '2017-2018'], doc.properties.family_incident_rate_per_100k_2017_18);\n}"
     }
   },
   "language": "javascript"
