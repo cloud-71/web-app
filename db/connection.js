@@ -5,6 +5,6 @@ const connection = (function connect() {
   const username = process.env['COUCHDB_USERNAME'] || 'admin';
   const password = process.env['COUCHDB_PASSWORD'] || 'admin';
   return Nano(`http://${username}:${password}@${host}`);
-})()
+})();
 
 export default connection;

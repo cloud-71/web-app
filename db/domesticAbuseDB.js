@@ -1,6 +1,6 @@
 import connection from './connection.js';
 
-async function graphDB(connection) {
+async function domesticAbuseDB(connection) {
   console.log(process.env['COUCHDB_DATABASE_AURIN']);
   const database_name =
     process.env['COUCHDB_DATABASE_AURIN'] || 'domestic_violence_vic';
@@ -12,4 +12,4 @@ async function graphDB(connection) {
   }
 }
 
-export default graphDB;
+export default domesticAbuseDB;
