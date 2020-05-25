@@ -1,4 +1,5 @@
 let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON, Control, Marker, Popup;
+let L;
 import ColorInterpolate from 'color-interpolate';
 import Card from 'react-bootstrap/Card';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
@@ -25,6 +26,7 @@ export default class DomesticAbuseMap extends React.Component {
     GeoJSON = await ReactLeaflet.GeoJSON;
     Marker = await ReactLeaflet.Marker;
     Popup = await ReactLeaflet.Popup;
+  
     this.forceUpdate();
   }
 
@@ -87,7 +89,7 @@ export default class DomesticAbuseMap extends React.Component {
             d.coordinates.coordinates[1],
             d.coordinates.coordinates[0],
           ];
-          obj['tweet'][d.id] = d.extended_tweet.full_text;
+          obj['tweet'][d.id] = d.full_text;//d.extended_tweet.full_text;
           obj['user'][d.id] = d.user.screen_name;
         }
       });

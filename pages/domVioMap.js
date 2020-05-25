@@ -8,6 +8,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 
+
 export default class Page extends React.Component {
   constructor(props) {
     super(props);
@@ -80,9 +81,9 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi');
+    let twitterData = await fetch('/api/twitterDBapi?transform=true');
     twitterData = await twitterData.json();
-    console.log(twitterData.wordCount);
+    //console.log(twitterData.wordCount);
     this.setState({ twitterData });
     this.setState({ loading: false });
   }
