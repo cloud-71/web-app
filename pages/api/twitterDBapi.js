@@ -9,7 +9,7 @@ import NodeGeocoder from 'node-geocoder';
 }*/
 
 export default async function (req, res) {
-  let geocodeTransform = req.query.transform || false;
+  let geocodeTransform = req.query.transform == 'true';
 
   const db = await twitterDB(connection);
   let wordCount = await db.view('views', 'sum_words', { group_level: 1 });
