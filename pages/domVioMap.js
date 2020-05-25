@@ -81,8 +81,8 @@ export default class Page extends React.Component {
   async fetchTweetData() {
     this.setState({ loading: true });
     let twitterData = await fetch('/api/twitterDBapi');
+    console.log('Word Count:', twitterData.wordCount);
     twitterData = await twitterData.json();
-    console.log(twitterData.wordCount);
     this.setState({ twitterData });
     this.setState({ loading: false });
   }
@@ -103,6 +103,10 @@ export default class Page extends React.Component {
   }
 
   render() {
+    console.log('domVioData', this.state.domVioData);
+    console.log('geometryData', this.state.geometryData);
+    console.log('mapCoordinate', this.state.mapCoordinateData);
+    console.log('graphData', this.state.domVioDataGraph);
     return (
       <>
         <Navbar sticky="top" variant="dark" bg="dark">
