@@ -134,18 +134,6 @@ export default class Page extends React.Component {
               </Jumbotron>
             </Col>
           </Row>
-          <Row ref={this.cloudRef}>
-            <Col>
-              <h3>Word Cloud</h3>
-              <p>Contains tweets that mention domestic violence</p>
-              <br></br>
-              <div>
-                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
-              </div>
-              <br></br>
-            </Col>
-            <Col></Col>
-          </Row>
           <Row ref={this.mapRef}>
             <Col>
               <h3>Map</h3>
@@ -158,6 +146,18 @@ export default class Page extends React.Component {
                 mapCoordinateData={this.state.mapData.mapCoordinateData}
               />
             </Col>
+          </Row>
+          <Row ref={this.cloudRef}>
+            <Col>
+              <h3>Word Cloud</h3>
+              <p>Contains tweets that mention domestic violence</p>
+              <br></br>
+              <div>
+                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
+              </div>
+              <br></br>
+            </Col>
+            <Col></Col>
           </Row>
           <Row ref={this.graphRef}>
             <Col>
