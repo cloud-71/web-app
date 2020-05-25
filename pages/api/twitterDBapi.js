@@ -10,7 +10,7 @@ import twitterDB from '../../db/twitterDB.js';
 
 export default async function (req, res) {
   const db = await twitterDB(connection);
-  let wordCount = await db.view('view', 'sum_words', { group_level: 1 });
+  let wordCount = await db.view('views', 'sum_words', { group_level: 1 });
   wordCount = wordCount.rows;
 
   let twitterData = await db.list({ include_docs: true });

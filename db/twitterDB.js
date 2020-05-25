@@ -2,7 +2,7 @@ import connection from './connection.js';
 
 async function twitterDB(connection) {
   const database_name =
-    process.env['COUCHDB_DATABASE_TWITTER'] || 'twitter_test';
+    process.env['COUCHDB_DATABASE_TWITTER'] || 'twitter_data';
   try {
     await connection.db.create(database_name);
     return connection.use(database_name);
