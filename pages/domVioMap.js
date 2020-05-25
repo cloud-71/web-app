@@ -117,11 +117,11 @@ export default class Page extends React.Component {
           <Nav.Link href="#" onSelect={() => this.scrollTo('map')}>
             Map
           </Nav.Link>
-          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
-            Graphs
-          </Nav.Link>
           <Nav.Link href="#" onSelect={() => this.scrollTo('cloud')}>
             Word Cloud
+          </Nav.Link>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
+            Graphs
           </Nav.Link>
         </Navbar>
         <Container fluid>
