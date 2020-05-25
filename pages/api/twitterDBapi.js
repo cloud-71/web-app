@@ -55,7 +55,7 @@ async function geocode(geocoder, doc){
     result = null;
   }
   if (result != null && result.length > 0){
-    console.log(result[0]);
+    //console.log(result[0]);
     doc.coordinates = {
       type: "Point",
       coordinates: [result[0].longitude, result[0].latitude]

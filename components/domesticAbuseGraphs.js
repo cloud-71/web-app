@@ -19,7 +19,7 @@ export default class DomesticAbuseGraphs extends React.Component {
       return;
 
     let cols = Object.keys(data).map(locationName => {
-      return <Col lg={4} md={3} sm={2} xs={1}>
+      return <Col lg={4} md={3} sm={2} xs={1} key={locationName}>
         <Card.Title>{locationName}</Card.Title>
         <DomesticAbuseGraph data={data[locationName]} />
       </Col>
