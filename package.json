@@ -19,6 +19,7 @@
     "react-dom": "16.13.1",
     "react-leaflet": "^2.7.0",
     "react-leaflet-control": "^2.1.2",
+    "react-tagcloud": "^2.0.0",
     "victory": "^34.1.3"
   },
   "devDependencies": {

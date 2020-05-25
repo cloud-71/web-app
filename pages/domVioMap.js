@@ -1,4 +1,5 @@
 import DomesticAbuseMap from '../components/domesticAbuseMap.js';
+import WordCloud from '../components/word-cloud';
 import DomesticAbuseGraphs from '../components/domesticAbuseGraphs.js';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -18,6 +19,7 @@ export default class Page extends React.Component {
     };
     this.mapRef = React.createRef();
     this.graphRef = React.createRef();
+    this.cloudRef = React.createRef();
     this.homeRef = React.createRef();
   }
 
@@ -36,7 +38,9 @@ export default class Page extends React.Component {
     }.bind(this);
     //define an async function to fetch domestic violence data, this is for the graphs
     let fetchDomVioDataGraph = async function () {
-      let domVioDataGraph = await fetch('/api/domesticViolence/location-year-view');
+      let domVioDataGraph = await fetch(
+        '/api/domesticViolence/location-year-view',
+      );
       domVioDataGraph = await domVioDataGraph.json();
       this.setState({ domVioDataGraph });
     }.bind(this);
@@ -61,9 +65,11 @@ export default class Page extends React.Component {
 
     this.setState({ loading: true });
     //run the fetching async functions, then when they're all completed set loading to false
-    Promise.all([fetchDomVioData(), fetchDomVioDataGraph(), fetchMapData()]).then(() =>
-      this.setState({ loading: false }),
-    );
+    Promise.all([
+      fetchDomVioData(),
+      fetchDomVioDataGraph(),
+      fetchMapData(),
+    ]).then(() => this.setState({ loading: false }));
 
     //old fetching
     /*let data = await fetch('/api/domesticViolence');
@@ -75,8 +81,8 @@ export default class Page extends React.Component {
   async fetchTweetData() {
     this.setState({ loading: true });
     let twitterData = await fetch('/api/twitterDBapi');
-    console.log(twitterData);
     twitterData = await twitterData.json();
+    console.log(twitterData.wordCount);
     this.setState({ twitterData });
     this.setState({ loading: false });
   }
@@ -86,6 +92,7 @@ export default class Page extends React.Component {
       map: this.mapRef,
       home: this.homeRef,
       graph: this.graphRef,
+      cloud: this.cloudRef,
     };
     let ref = refs[element];
     ref.current.scrollIntoView({
@@ -109,6 +116,9 @@ export default class Page extends React.Component {
           <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
             Graphs
           </Nav.Link>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('cloud')}>
+            Word Cloud
+          </Nav.Link>
         </Navbar>
         <Container fluid>
           <Row ref={this.homeRef}>
@@ -126,10 +136,10 @@ export default class Page extends React.Component {
               <DomesticAbuseMap
                 height={'500px'}
                 loading={this.state.loading}
+                twitterData={this.state.twitterData.twitterData}
                 domVioData={this.state.domVioData}
                 geometryData={this.state.mapData.geometryData}
                 mapCoordinateData={this.state.mapData.mapCoordinateData}
-                twitterData={this.state.twitterData}
               />
             </Col>
           </Row>
@@ -141,6 +151,22 @@ export default class Page extends React.Component {
                 loading={this.state.loading}
               />
             </Col>
+          </Row>
+          <Row ref={this.cloudRef}>
+            <Col>
+              <h3>Word Cloud</h3>
+              <p>Contains tweets that mention domestic violence</p>
+              <div>
+                <WordCloud data={this.state.twitterData.wordCount} />
+              </div>
+              <style jsx>{`
+                div {
+                  border-style: solid;
+                  border-width: 10px;
+                }
+              `}</style>
+            </Col>
+            <Col></Col>
           </Row>
         </Container>
       </>
