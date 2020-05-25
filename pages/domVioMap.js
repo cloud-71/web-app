@@ -152,6 +152,7 @@ export default class Page extends React.Component {
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
+              <p>Contains tweets that mention domestic violence</p>
               <WordCloud data={this.state.twitterData.wordCount}
                 className={styles.default}></WordCloud>
             </Col>
