@@ -80,7 +80,7 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi');
+    let twitterData = await fetch('/api/twitterDBapi?transform=true');
     console.log('Word Count:', twitterData.wordCount);
     twitterData = await twitterData.json();
     this.setState({ twitterData });
