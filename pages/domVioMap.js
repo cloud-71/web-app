@@ -117,11 +117,11 @@ export default class Page extends React.Component {
           <Nav.Link href="#" onSelect={() => this.scrollTo('map')}>
             Map
           </Nav.Link>
-          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
-            Graphs
-          </Nav.Link>
           <Nav.Link href="#" onSelect={() => this.scrollTo('cloud')}>
             Word Cloud
+          </Nav.Link>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
+            Graphs
           </Nav.Link>
         </Navbar>
         <Container fluid>
@@ -147,6 +147,18 @@ export default class Page extends React.Component {
               />
             </Col>
           </Row>
+          <Row ref={this.cloudRef}>
+            <Col>
+              <h3>Word Cloud</h3>
+              <p>Contains tweets that mention domestic violence</p>
+              <br></br>
+              <div>
+                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
+              </div>
+              <br></br>
+            </Col>
+            <Col></Col>
+          </Row>
           <Row ref={this.graphRef}>
             <Col>
               <h3>Graphs</h3>
@@ -155,22 +167,6 @@ export default class Page extends React.Component {
                 loading={this.state.loading}
               />
             </Col>
-          </Row>
-          <Row ref={this.cloudRef}>
-            <Col>
-              <h3>Word Cloud</h3>
-              <p>Contains tweets that mention domestic violence</p>
-              <div>
-                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
-              </div>
-              <style jsx>{`
-                div {
-                  border-style: solid;
-                  border-width: 10px;
-                }
-              `}</style>
-            </Col>
-            <Col></Col>
           </Row>
         </Container>
       </>
