@@ -81,7 +81,6 @@ export default class Page extends React.Component {
   async fetchTweetData() {
     this.setState({ loading: true });
     let twitterData = await fetch('/api/twitterDBapi');
-    //console.log('Word Count:', twitterData.wordCount);
     twitterData = await twitterData.json();
     this.setState({ twitterData });
     this.setState({ loading: false });
@@ -107,6 +106,20 @@ export default class Page extends React.Component {
     //console.log('geometryData', this.state.geometryData);
     //console.log('mapCoordinate', this.state.mapCoordinateData);
     //console.log('graphData', this.state.domVioDataGraph);
+    let amount = 0;
+    let total = 0;
+    if (this.state.twitterData.covidOccurance) {
+      let first = this.state.twitterData.covidOccurance[0];
+      let second = this.state.twitterData.covidOccurance[1];
+      if (first.key == 'relevant') {
+        amount = first.value;
+        total = second.value + amount;
+      } else {
+        amount = second.value;
+        total = first.value + amount;
+      }
+    }
+    //<h2>{this.state.twitterData.covidOccurance[0].value}</h2>
     return (
       <>
         <Navbar sticky="top" variant="dark" bg="dark">
@@ -131,6 +144,9 @@ export default class Page extends React.Component {
                 <h1>COMP90024 Cluster and Cloud Computing</h1>
                 <p>Placeholder text</p>
                 <p>Lorem ipsum dolor sit amet I forgot the rest</p>
+                <h2>
+                  {amount} of {total} tweets mention Covid-19
+                </h2>
               </Jumbotron>
             </Col>
           </Row>
