@@ -9,9 +9,9 @@ which is stored in a CouchDB database named `domestic_violence_vic`
 For Tweet visualization, the tweets are stored in a CouchDB database named `twitter_data`
 
 Ensure CouchDB databases are set up beforehand for proper execution.
-See:
--https://github.com/cloud-71/twitter-harvester
--https://github.com/cloud-71/aurin-harvester
+See:\
+https://github.com/cloud-71/twitter-harvester \
+https://github.com/cloud-71/aurin-harvester
 
 Setup environment with:
  
