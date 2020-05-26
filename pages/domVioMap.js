@@ -80,8 +80,8 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi?transform=true');
-    console.log('Word Count:', twitterData.wordCount);
+    let twitterData = await fetch('/api/twitterDBapi');
+    //console.log('Word Count:', twitterData.wordCount);
     twitterData = await twitterData.json();
     this.setState({ twitterData });
     this.setState({ loading: false });
@@ -103,10 +103,10 @@ export default class Page extends React.Component {
   }
 
   render() {
-    console.log('domVioData', this.state.domVioData);
-    console.log('geometryData', this.state.geometryData);
-    console.log('mapCoordinate', this.state.mapCoordinateData);
-    console.log('graphData', this.state.domVioDataGraph);
+    //console.log('domVioData', this.state.domVioData);
+    //console.log('geometryData', this.state.geometryData);
+    //console.log('mapCoordinate', this.state.mapCoordinateData);
+    //console.log('graphData', this.state.domVioDataGraph);
     return (
       <>
         <Navbar sticky="top" variant="dark" bg="dark">
@@ -173,17 +173,3 @@ export default class Page extends React.Component {
     );
   }
 }
-
-//I can't get server-side rendering to work, so for now I'm using client-side data fetching.
-/*export async function getStaticProps(){
-  console.log("hi")
-  let domViodata = await fetch("/api/domesticViolence");
-  domViodata = await domViodata.json();
-  console.log(domVioData);
-
-  return {
-    props: {
-      domVioData
-    }
-  }
-}*/

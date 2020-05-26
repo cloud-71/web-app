@@ -28,7 +28,7 @@ export default class DomesticAbuseMap extends React.Component {
     Popup = await ReactLeaflet.Popup;
     //marker icons don't show up unless you do this
     L = await require('leaflet');
-    L.Icon.Default.imagePath='images/'
+    L.Icon.Default.imagePath = 'images/';
     this.forceUpdate();
   }
 
@@ -85,13 +85,14 @@ export default class DomesticAbuseMap extends React.Component {
     twitterData
       .map((d) => d.doc)
       .forEach((d) => {
-        if (d.id && d.coordinates && d.extended_tweet && d.user) {
+        if (d.id && d.coordinates && d.user) {
+          console.log('tweet location found');
           //lat and long are backwards
           obj['coordinates'][d.id] = [
             d.coordinates.coordinates[1],
             d.coordinates.coordinates[0],
           ];
-          obj['tweet'][d.id] = d.full_text;//d.extended_tweet.full_text;
+          obj['tweet'][d.id] = d.full_text; //d.extended_tweet.full_text;
           obj['user'][d.id] = d.user.screen_name;
         }
       });
@@ -105,7 +106,11 @@ export default class DomesticAbuseMap extends React.Component {
 
     return Object.keys(twitterData['coordinates']).map((tweet) => (
       //Spectrum is hard coded, had something to find maximum\
-      <Marker draggable={false} position={twitterData['coordinates'][tweet]} key={tweet}>
+      <Marker
+        draggable={false}
+        position={twitterData['coordinates'][tweet]}
+        key={tweet}
+      >
         <Popup>
           @{twitterData['user'][tweet]}
           <br />

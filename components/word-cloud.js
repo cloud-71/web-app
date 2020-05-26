@@ -208,4 +208,5 @@ const stopwords = [
   'co',
   'p',
   'get',
+  'https',
 ];
