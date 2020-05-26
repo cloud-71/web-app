@@ -15,20 +15,25 @@ export default async function (req, res) {
   let wordCount = await db.view('views', 'sum_words', { group_level: 1 });
   wordCount = wordCount.rows;
 
+  let covidOccurance = await db.view('views', 'covid_occurance', {
+    group_level: 1,
+  });
+  covidOccurance = covidOccurance.rows;
+
   let twitterData = await db.list({ include_docs: true });
   twitterData = twitterData.rows;
   //transform geodata into
-  if (geocodeTransform){
-    let geocoder = NodeGeocoder({provider: 'openstreetmap'});
-    for (let i = 0; i < twitterData.length; i++){
+  if (geocodeTransform) {
+    let geocoder = NodeGeocoder({ provider: 'openstreetmap' });
+    for (let i = 0; i < twitterData.length; i++) {
       let doc = twitterData[i].doc;
       let promises = [];
-      if (doc.coordinates != null){
+      if (doc.coordinates != null) {
         continue;
-      } else if (doc.geo != null){
+      } else if (doc.geo != null) {
         doc.coordinates = {
-          type: "Point",
-          coordinates: [doc.geo.coordinates[1], doc.geo.coordinates[0]]
+          type: 'Point',
+          coordinates: [doc.geo.coordinates[1], doc.geo.coordinates[0]],
         };
       } else {
         let geocodePromise = geocode(geocoder, doc);
@@ -38,27 +43,30 @@ export default async function (req, res) {
     }
   }
 
-  const result = { twitterData, wordCount };
+  const result = { twitterData, wordCount, covidOccurance };
   res.status(200).json(result);
 }
 
-async function geocode(geocoder, doc){
-  let placename = doc.place != null ?                             doc.place.full_name :
-                  doc.user != null && doc.user.location != null ? doc.user.location : "";
-  if (placename.length <= 0)
-    return;
+async function geocode(geocoder, doc) {
+  let placename =
+    doc.place != null
+      ? doc.place.full_name
+      : doc.user != null && doc.user.location != null
+      ? doc.user.location
+      : '';
+  if (placename.length <= 0) return;
 
   let result;
-  try{
+  try {
     result = await geocoder.geocode(placename);
-  } catch(e) {
+  } catch (e) {
     result = null;
   }
-  if (result != null && result.length > 0){
+  if (result != null && result.length > 0) {
     //console.log(result[0]);
     doc.coordinates = {
-      type: "Point",
-      coordinates: [result[0].longitude, result[0].latitude]
+      type: 'Point',
+      coordinates: [result[0].longitude, result[0].latitude],
     };
   }
 }
