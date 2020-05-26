@@ -36,8 +36,8 @@ export default class DomesticAbuseGraphs extends React.Component {
         <Row>
           <Navbar sticky="top">
             <Navbar.Text>
-              Victoria statistics. Compares year against rate of domestic
-              violence for every 100,000 population.
+              Compares year against rate of domestic violence for every 100,000
+              population throughout Victoria.
             </Navbar.Text>
           </Navbar>
         </Row>
