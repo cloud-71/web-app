@@ -85,7 +85,7 @@ export default class DomesticAbuseMap extends React.Component {
     twitterData
       .map((d) => d.doc)
       .forEach((d) => {
-        if (d.coordinates != null) {
+        if (d.id && d.coordinates && d.extended_tweet && d.user) {
           //lat and long are backwards
           obj['coordinates'][d.id] = [
             d.coordinates.coordinates[1],

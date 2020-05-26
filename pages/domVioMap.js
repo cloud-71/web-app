@@ -8,7 +8,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 
-
 export default class Page extends React.Component {
   constructor(props) {
     super(props);
@@ -81,9 +80,9 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi?transform=true');
+    let twitterData = await fetch('/api/twitterDBapi');
+    console.log('Word Count:', twitterData.wordCount);
     twitterData = await twitterData.json();
-    //console.log(twitterData.wordCount);
     this.setState({ twitterData });
     this.setState({ loading: false });
   }
@@ -104,6 +103,10 @@ export default class Page extends React.Component {
   }
 
   render() {
+    console.log('domVioData', this.state.domVioData);
+    console.log('geometryData', this.state.geometryData);
+    console.log('mapCoordinate', this.state.mapCoordinateData);
+    console.log('graphData', this.state.domVioDataGraph);
     return (
       <>
         <Navbar sticky="top" variant="dark" bg="dark">
@@ -114,11 +117,11 @@ export default class Page extends React.Component {
           <Nav.Link href="#" onSelect={() => this.scrollTo('map')}>
             Map
           </Nav.Link>
-          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
-            Graphs
-          </Nav.Link>
           <Nav.Link href="#" onSelect={() => this.scrollTo('cloud')}>
             Word Cloud
+          </Nav.Link>
+          <Nav.Link href="#" onSelect={() => this.scrollTo('graph')}>
+            Graphs
           </Nav.Link>
         </Navbar>
         <Container fluid>
@@ -144,6 +147,18 @@ export default class Page extends React.Component {
               />
             </Col>
           </Row>
+          <Row ref={this.cloudRef}>
+            <Col>
+              <h3>Word Cloud</h3>
+              <p>Contains tweets that mention domestic violence</p>
+              <br></br>
+              <div>
+                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
+              </div>
+              <br></br>
+            </Col>
+            <Col></Col>
+          </Row>
           <Row ref={this.graphRef}>
             <Col>
               <h3>Graphs</h3>
@@ -152,22 +167,6 @@ export default class Page extends React.Component {
                 loading={this.state.loading}
               />
             </Col>
-          </Row>
-          <Row ref={this.cloudRef}>
-            <Col>
-              <h3>Word Cloud</h3>
-              <p>Contains tweets that mention domestic violence</p>
-              <div>
-                <WordCloud data={this.state.twitterData.wordCount} />
-              </div>
-              <style jsx>{`
-                div {
-                  border-style: solid;
-                  border-width: 10px;
-                }
-              `}</style>
-            </Col>
-            <Col></Col>
           </Row>
         </Container>
       </>
