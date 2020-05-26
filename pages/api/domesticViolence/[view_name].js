@@ -12,8 +12,6 @@ export default async function (req, res) {
   //into        {k11: {k21: v1, k22: v2}}
   let domVioData = {};
   domVioD.rows.forEach((d) => {
-    let year = d.key[0];
-    let location = d.key[1];
     if (domVioData[d.key[0]] == null) domVioData[d.key[0]] = {};
     domVioData[d.key[0]][d.key[1]] = d.value;
   });

@@ -1,4 +1,5 @@
 let ReactLeaflet, TileLayer, Map, Tooltip, GeoJSON, Control, Marker, Popup;
+let L;
 import ColorInterpolate from 'color-interpolate';
 import Card from 'react-bootstrap/Card';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
@@ -25,6 +26,9 @@ export default class DomesticAbuseMap extends React.Component {
     GeoJSON = await ReactLeaflet.GeoJSON;
     Marker = await ReactLeaflet.Marker;
     Popup = await ReactLeaflet.Popup;
+    //marker icons don't show up unless you do this
+    L = await require('leaflet');
+    L.Icon.Default.imagePath='images/'
     this.forceUpdate();
   }
 
@@ -87,7 +91,7 @@ export default class DomesticAbuseMap extends React.Component {
             d.coordinates.coordinates[1],
             d.coordinates.coordinates[0],
           ];
-          obj['tweet'][d.id] = d.extended_tweet.full_text;
+          obj['tweet'][d.id] = d.full_text;//d.extended_tweet.full_text;
           obj['user'][d.id] = d.user.screen_name;
         }
       });
@@ -101,7 +105,7 @@ export default class DomesticAbuseMap extends React.Component {
 
     return Object.keys(twitterData['coordinates']).map((tweet) => (
       //Spectrum is hard coded, had something to find maximum\
-      <Marker draggable={false} position={twitterData['coordinates'][tweet]}>
+      <Marker draggable={false} position={twitterData['coordinates'][tweet]} key={tweet}>
         <Popup>
           @{twitterData['user'][tweet]}
           <br />
@@ -123,6 +127,7 @@ export default class DomesticAbuseMap extends React.Component {
     return Object.keys(incidentsPerLocation).map((locationName) => (
       //Spectrum is hard coded, had something to find maximum
       <GeoJSON
+        key={locationName}
         data={geoJSONData[locationName]}
         color={
           incidentsPerLocation[locationName] < 4000
