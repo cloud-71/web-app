@@ -4,14 +4,15 @@ import ColorInterpolate from 'color-interpolate';
 import Card from 'react-bootstrap/Card';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Spinner from 'react-bootstrap/Spinner';
 
 export default class DomesticAbuseMap extends React.Component {
   constructor(props) {
-    //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, height
+    //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, tweetLoading, height, onRequestMoreTweets
     super(props);
-    this.state = { displayYear: '2015-2016' };
+    this.state = { displayYear: '2015-2016', redIcon: null };
   }
 
   async componentDidMount() {
@@ -29,6 +30,15 @@ export default class DomesticAbuseMap extends React.Component {
     //marker icons don't show up unless you do this
     L = await require('leaflet');
     L.Icon.Default.imagePath = 'images/';
+
+    let redIcon = Object.assign({}, L.Icon.Default.prototype.options);
+    redIcon.iconUrl = 'images/marker-icon-red.png';
+    redIcon.shadowUrl = 'images/' + redIcon.shadowUrl;
+    redIcon.iconRetinaUrl = null;
+    redIcon.shadowRetinaUrl = null;
+    this.setState({
+      redIcon: L.icon(redIcon),
+    });
     this.forceUpdate();
   }
 
@@ -68,6 +78,14 @@ export default class DomesticAbuseMap extends React.Component {
               Population
             </Card.Title>
             {yearButtons}
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              disabled={this.props.tweetLoading}
+              onClick={this.props.onRequestMoreTweets}
+            >
+              More Tweets
+            </Button>
           </Card.Body>
         </Card>
       </Control>
@@ -83,20 +101,11 @@ export default class DomesticAbuseMap extends React.Component {
       user: {},
     };
     twitterData
-      .map((d) => d.doc)
+      .filter((d) => d.key[0] == 'coordinates')
       .forEach((d) => {
-        if (d.coordinates) {
-          console.log(d);
-        }
-        if (d.id && d.coordinates && d.user) {
-          //lat and long are backwards
-          obj['coordinates'][d.id] = [
-            d.coordinates.coordinates[1],
-            d.coordinates.coordinates[0],
-          ];
-          obj['tweet'][d.id] = d.full_text; //d.extended_tweet.full_text;
-          obj['user'][d.id] = d.user.screen_name;
-        }
+        obj['coordinates'][d.value.id] = [d.key[1][1], d.key[1][0]];
+        obj['tweet'][d.value.id] = d.value.full_text; //d.extended_tweet.full_text;
+        obj['user'][d.value.id] = d.value.user_name;
       });
     return obj;
   }
@@ -105,21 +114,43 @@ export default class DomesticAbuseMap extends React.Component {
     if (!this.props.twitterData) return;
 
     let twitterData = this.tweetLocations(this.props.twitterData);
+    let containsCovid = function (words) {
+      if (!words) return false;
+      return (
+        words.toLowerCase().includes('covid') ||
+        words.toLowerCase().includes('corona virus') ||
+        words.toLowerCase().includes('coronavirus')
+      );
+    };
 
-    return Object.keys(twitterData['coordinates']).map((tweet) => (
-      //Spectrum is hard coded, had something to find maximum\
-      <Marker
-        draggable={false}
-        position={twitterData['coordinates'][tweet]}
-        key={tweet}
-      >
-        <Popup>
-          @{twitterData['user'][tweet]}
-          <br />
-          {twitterData['tweet'][tweet]}
-        </Popup>
-      </Marker>
-    ));
+    return Object.keys(twitterData['coordinates']).map((tweet) =>
+      containsCovid(twitterData['tweet'][tweet]) ? (
+        <Marker
+          icon={this.state.redIcon}
+          draggable={false}
+          position={twitterData['coordinates'][tweet]}
+          key={tweet}
+        >
+          <Popup>
+            @{twitterData['user'][tweet]}
+            <br />
+            {twitterData['tweet'][tweet]}
+          </Popup>
+        </Marker>
+      ) : (
+        <Marker
+          draggable={false}
+          position={twitterData['coordinates'][tweet]}
+          key={tweet}
+        >
+          <Popup>
+            @{twitterData['user'][tweet]}
+            <br />
+            {twitterData['tweet'][tweet]}
+          </Popup>
+        </Marker>
+      ),
+    );
   }
 
   geoJSONMarkers() {

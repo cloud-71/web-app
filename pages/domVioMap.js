@@ -16,12 +16,16 @@ export default class Page extends React.Component {
       mapData: {},
       domVioData: {},
       twitterData: [],
+      twitterDataFetchLimit: 15,
+      wordCount: null,
+      covidOccurence: null,
       loading: false,
     };
     this.mapRef = React.createRef();
     this.graphRef = React.createRef();
     this.cloudRef = React.createRef();
     this.homeRef = React.createRef();
+    this.onRequestMoreTweets = this.onRequestMoreTweets.bind(this);
   }
 
   async componentDidMount() {
@@ -80,25 +84,58 @@ export default class Page extends React.Component {
   }
 
   async fetchTweetData() {
-    this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi?transform=true');
-    twitterData = await twitterData.json();
-    this.setState({ twitterData });
-    this.setState({ loading: false });
+    //this.setState({ loading: true });
+
+    //define an async function to fetch wordcloud data
+    let fetchWordCountData = async function () {
+      let wordCount = await fetch('/api/twitterDBapi/wordCount');
+      wordCount = await wordCount.json();
+      this.setState({ wordCount });
+    }.bind(this);
+    //define an async function to fetch wordcloud data
+    let fetchCovidOccData = async function () {
+      let covidOccurence = await fetch('/api/twitterDBapi/covidOccurence');
+      covidOccurence = await covidOccurence.json();
+      this.setState({ covidOccurence });
+    }.bind(this);
+
+    this.fetchTwitterData();
+    fetchWordCountData();
+    fetchCovidOccData();
+    //this.setState({ loading: false });
   }
+
+  //define an async function to fetch domestic violence data
+  async fetchTwitterData() {
+    this.setState({tweetLoading: true});
+    let limit = this.state.twitterDataFetchLimit;
+    let twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + this.state.twitterData.length + '&limit=' + limit);
+    twitterData = await twitterData.json();
+    this.setState(
+      state => ({
+        twitterData: state.twitterData.concat(twitterData),
+        tweetLoading: false
+      }),
+      //after setting state is done, fetch again if there are more data
+      () => {
+        if (twitterData.length == limit){
+          this.fetchTwitterData();
+        }
+      });
+  };
 
   countOfTweetsPerArea(){
     let res = {};
     const geoData = this.state.mapData.geometryData;
-    const tweets = this.state.twitterData.twitterData;
+    const tweets = this.state.twitterData;
     if (geoData == null || tweets == null) return;
 
     for (let locationName in geoData){
       res[locationName] = 0;
       //get the polygon that defines an area's boundaries
       const polygon = geoData[locationName].coordinates[0][0];
-      for (let tweet of tweets){
-        const point = tweet.doc.coordinates && tweet.doc.coordinates.coordinates;
+      for (let tweet of tweets.filter(t => t.key[0] == 'coordinates')){
+        const point = tweet.key[1];
         //check if the tweet's location in inside the area
         if (point != null && pointInPolygon(point, polygon)){
           res[locationName] += 1;
@@ -123,6 +160,10 @@ export default class Page extends React.Component {
     });
   }
 
+  onRequestMoreTweets(){
+    this.fetchTwitterData();
+  }
+
   render() {
     //console.log('domVioData', this.state.domVioData);
     //console.log('geometryData', this.state.geometryData);
@@ -130,16 +171,9 @@ export default class Page extends React.Component {
     //console.log('graphData', this.state.domVioDataGraph);
     let amount = 0;
     let total = 0;
-    if (this.state.twitterData.covidOccurance) {
-      let first = this.state.twitterData.covidOccurance[0];
-      let second = this.state.twitterData.covidOccurance[1];
-      if (first.key == 'relevant') {
-        amount = first.value;
-        total = second.value + amount;
-      } else {
-        amount = second.value;
-        total = first.value + amount;
-      }
+    if (this.state.covidOccurence) {
+      amount = this.state.covidOccurence.find(c => c.key == 'relevant').value;
+      total = this.state.covidOccurence.find(c => c.key == 'total').value
     }
     let covid_ratio = amount + ' of ' + total + ' tweets mention Covid-19';
     if (total == 0) covid_ratio = '';
@@ -183,8 +217,7 @@ export default class Page extends React.Component {
           <Row ref={this.mapRef}>
             <Col>
               <h3>Map</h3>
-
-              <Navbar sticky="top">
+              <Navbar>
                 <Navbar.Text>
                   Sourced from AURIN datasets in order to capture the historical
                   rates of known domestic violence cases.
@@ -193,17 +226,19 @@ export default class Page extends React.Component {
               <DomesticAbuseMap
                 height={'500px'}
                 loading={this.state.loading}
-                twitterData={this.state.twitterData.twitterData}
+                tweetLoading={this.state.tweetLoading}
+                twitterData={this.state.twitterData}
                 domVioData={this.state.domVioData}
                 geometryData={this.state.mapData.geometryData}
                 mapCoordinateData={this.state.mapData.mapCoordinateData}
+                onRequestMoreTweets={this.onRequestMoreTweets}
               />
             </Col>
           </Row>
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
-              <WordCloud data={this.state.twitterData.wordCount} topK={60} />
+              <WordCloud data={this.state.wordCount} topK={60} />
               <br></br>
             </Col>
             <Col></Col>
