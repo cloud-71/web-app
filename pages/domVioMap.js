@@ -141,6 +141,8 @@ export default class Page extends React.Component {
         total = first.value + amount;
       }
     }
+    let covid_ratio = amount + ' of ' + total + ' tweets mention Covid-19';
+    if (total == 0) covid_ratio = '';
     //<h2>{this.state.twitterData.covidOccurance[0].value}</h2>
     return (
       <>
@@ -164,17 +166,30 @@ export default class Page extends React.Component {
             <Col>
               <Jumbotron>
                 <h1>COMP90024 Cluster and Cloud Computing</h1>
-                <p>Placeholder text</p>
-                <p>Lorem ipsum dolor sit amet I forgot the rest</p>
-                <h2>
-                  {amount} of {total} tweets mention Covid-19
-                </h2>
+                <p>Group 71</p>
+                <p>
+                  There have been concerns raised over the increased possibility
+                  and severity for domestic violence, due to the increased time
+                  spent with family members, economic stressors, lack of
+                  ‘escape’ opportunities etc. As a result, we wished to
+                  investigate rates of domestic violence and abuse in Australian
+                  cities and compare this with public awareness to the issue.
+                </p>
+
+                <h2>{covid_ratio}</h2>
               </Jumbotron>
             </Col>
           </Row>
           <Row ref={this.mapRef}>
             <Col>
               <h3>Map</h3>
+
+              <Navbar sticky="top">
+                <Navbar.Text>
+                  Sourced from AURIN datasets in order to capture the historical
+                  rates of known domestic violence cases.
+                </Navbar.Text>
+              </Navbar>
               <DomesticAbuseMap
                 height={'500px'}
                 loading={this.state.loading}
@@ -188,11 +203,7 @@ export default class Page extends React.Component {
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
-              <p>Contains tweets that mention domestic violence</p>
-              <br></br>
-              <div>
-                <WordCloud data={this.state.twitterData.wordCount} topK={60} />
-              </div>
+              <WordCloud data={this.state.twitterData.wordCount} topK={60} />
               <br></br>
             </Col>
             <Col></Col>

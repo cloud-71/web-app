@@ -1,5 +1,7 @@
 import React from 'react';
 import { TagCloud } from 'react-tagcloud';
+import Row from 'react-bootstrap/Row';
+import Navbar from 'react-bootstrap/Navbar';
 
 // custom renderer is function which has tag, computed font size and
 // color as arguments, and returns react component which represents tag
@@ -65,13 +67,27 @@ export default class WordCloud extends React.Component {
       return <div></div>;
     }
     return (
-      <TagCloud
-        minSize={1}
-        maxSize={5}
-        renderer={customRenderer}
-        tags={this.prepareData(this.props.data)}
-        className="simple-cloud"
-      />
+      <>
+        <Row>
+          <Navbar sticky="top">
+            <Navbar.Text>
+              Word cloud made up of tweets collected that contained any
+              reference to domestic violence in Australia.
+            </Navbar.Text>
+          </Navbar>
+        </Row>
+        <Row>
+          <br />
+          <br />
+          <TagCloud
+            minSize={1}
+            maxSize={5}
+            renderer={customRenderer}
+            tags={this.prepareData(this.props.data)}
+            className="simple-cloud"
+          />
+        </Row>
+      </>
     );
   }
 }
