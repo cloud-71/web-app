@@ -95,9 +95,11 @@ export default class Page extends React.Component {
 
     for (let locationName in geoData){
       res[locationName] = 0;
+      //get the polygon that defines an area's boundaries
       const polygon = geoData[locationName].coordinates[0][0];
       for (let tweet of tweets){
         const point = tweet.doc.coordinates && tweet.doc.coordinates.coordinates;
+        //check if the tweet's location in inside the area
         if (point != null && pointInPolygon(point, polygon)){
           res[locationName] += 1;
         }
