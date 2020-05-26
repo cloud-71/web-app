@@ -204,4 +204,8 @@ const stopwords = [
   'don',
   'should',
   'now',
+  'rt',
+  'co',
+  'p',
+  'get',
 ];
