@@ -59,8 +59,8 @@ export default class WordCloud extends React.Component {
 
   render() {
     if (this.props.data != undefined) {
-      console.log(this.props.data.length);
-      console.log(this.prepareData(this.props.data));
+      //console.log(this.props.data.length);
+      //console.log(this.prepareData(this.props.data));
     } else {
       return <div></div>;
     }
