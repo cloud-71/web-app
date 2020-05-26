@@ -3,55 +3,65 @@ import twitterDB from '../../../db/twitterDB.js';
 import NodeGeocoder from 'node-geocoder';
 
 export default async function (req, res) {
-  let geocodeTransform = req.query.transform == 'true';
+  //let geocodeTransform = req.query.transform == 'true';
+  let {withCoordinatesOnly, skip, limit} = req.query;
+  withCoordinatesOnly = withCoordinatesOnly == 'true';
 
   const db = await twitterDB(connection);
-  let twitterData = await db.list({ include_docs: true });
+  let options = {
+    include_docs: true,
+  }
+  if (skip != null && limit != null)
+    Object.assign(options, {limit, skip});
+  if (withCoordinatesOnly){
+    Object.assign(options, {
+      startkey: ['coordinates'],
+      endkey: ['coordinates', {}]
+    })
+  }
+
+  let twitterData = await db.view('views', 'group_by_location', options);
   twitterData = twitterData.rows;
   //transform geodata into
-  if (geocodeTransform) {
+  if (!withCoordinatesOnly) {
     let geocoder = NodeGeocoder({ provider: 'openstreetmap' });
-    for (let i = 0; i < twitterData.length; i++) {
-      let doc = twitterData[i].doc;
-      let promises = [];
-      if (doc.coordinates != null) {
-        continue;
-      } else if (doc.geo != null) {
-        doc.coordinates = {
-          type: 'Point',
-          coordinates: [doc.geo.coordinates[1], doc.geo.coordinates[0]],
-        };
-      } else {
-        let geocodePromise = geocode(geocoder, doc);
-        promises.push(geocodePromise);
-      }
-      await Promise.all(promises);
-    }
+    let promises = [];
+
+    for (let data of twitterData.filter(d => d.key[0] == 'place_name')) {
+      await geocode(geocoder, data, db);
+    };
   }
 
   res.status(200).json(twitterData);
 }
 
-async function geocode(geocoder, doc) {
-  let placename =
-    doc.place != null
-      ? doc.place.full_name
-      : doc.user != null && doc.user.location != null
-      ? doc.user.location
-      : '';
+async function geocode(geocoder, doc, db) {
+  let placename = doc.key[1];
   if (placename.length <= 0) return;
 
-  let result;
   try {
-    result = await geocoder.geocode({q: placename, limit: 1, addressdetails: 1, countrycodes:['AU']}); //limit it to Australia only
-  } catch (e) {
-    result = null;
+     //find from cache
+    let cacheResult = await db.get(placename);
+    if (cacheResult.coordinates == null) return;  //null coordinates mean it couldn't be geocoded
+
+    doc.key = ['coordinates', cacheResult.coordinates];
+  } catch (e){
+    //use geocoder
+    let result;
+    try {
+      result = await geocoder.geocode({q: placename, limit: 1, addressdetails: 1, countrycodes:['AU']}); //limit it to Australia only
+    } catch (e) {
+      console.log(e);
+      result = null;
+    }
+    if (result != null && result.length > 0) {
+      let coordinates = [result[0].longitude, result[0].latitude]
+      db.insert({_id: placename, coordinates, type:'placename_cache'}); //insert into cache
+      doc.key = ['coordinates', coordinates]
+    } else if (result.length == 0){
+       //insert into cache to determine it couldn't be found before
+      db.insert({_id: placename, coordinates: null, type:'placename_cache'});
+    }
   }
-  if (result != null && result.length > 0) {
-    //console.log(result[0]);
-    doc.coordinates = {
-      type: 'Point',
-      coordinates: [result[0].longitude, result[0].latitude],
-    };
-  }
+
 }

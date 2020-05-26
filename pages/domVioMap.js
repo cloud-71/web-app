@@ -16,6 +16,7 @@ export default class Page extends React.Component {
       mapData: {},
       domVioData: {},
       twitterData: [],
+      twitterDataFetchLimit: 15,
       wordCount: null,
       covidOccurence: null,
       loading: false,
@@ -24,6 +25,7 @@ export default class Page extends React.Component {
     this.graphRef = React.createRef();
     this.cloudRef = React.createRef();
     this.homeRef = React.createRef();
+    this.onRequestMoreTweets = this.onRequestMoreTweets.bind(this);
   }
 
   async componentDidMount() {
@@ -83,12 +85,7 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     //this.setState({ loading: true });
-    //define an async function to fetch domestic violence data
-    let fetchTwitterData = async function () {
-      let twitterData = await fetch('/api/twitterDBapi/twitterData?transform=true');
-      twitterData = await twitterData.json();
-      this.setState({ twitterData });
-    }.bind(this);
+
     //define an async function to fetch wordcloud data
     let fetchWordCountData = async function () {
       let wordCount = await fetch('/api/twitterDBapi/wordCount');
@@ -102,24 +99,43 @@ export default class Page extends React.Component {
       this.setState({ covidOccurence });
     }.bind(this);
 
-    fetchTwitterData();
+    this.fetchTwitterData();
     fetchWordCountData();
-    //fetchCovidOccData();
+    fetchCovidOccData();
     //this.setState({ loading: false });
   }
+
+  //define an async function to fetch domestic violence data
+  async fetchTwitterData() {
+    this.setState({tweetLoading: true});
+    let limit = this.state.twitterDataFetchLimit;
+    let twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + this.state.twitterData.length + '&limit=' + limit);
+    twitterData = await twitterData.json();
+    this.setState(
+      state => ({
+        twitterData: state.twitterData.concat(twitterData),
+        tweetLoading: false
+      }),
+      //after setting state is done, fetch again if there are more data
+      () => {
+        if (twitterData.length == limit){
+          this.fetchTwitterData();
+        }
+      });
+  };
 
   countOfTweetsPerArea(){
     let res = {};
     const geoData = this.state.mapData.geometryData;
-    const tweets = this.state.twitterData.twitterData;
+    const tweets = this.state.twitterData;
     if (geoData == null || tweets == null) return;
 
     for (let locationName in geoData){
       res[locationName] = 0;
       //get the polygon that defines an area's boundaries
       const polygon = geoData[locationName].coordinates[0][0];
-      for (let tweet of tweets){
-        const point = tweet.doc.coordinates && tweet.doc.coordinates.coordinates;
+      for (let tweet of tweets.filter(t => t.key[0] == 'coordinates')){
+        const point = tweet.key[1];
         //check if the tweet's location in inside the area
         if (point != null && pointInPolygon(point, polygon)){
           res[locationName] += 1;
@@ -144,6 +160,10 @@ export default class Page extends React.Component {
     });
   }
 
+  onRequestMoreTweets(){
+    this.fetchTwitterData();
+  }
+
   render() {
     //console.log('domVioData', this.state.domVioData);
     //console.log('geometryData', this.state.geometryData);
@@ -152,15 +172,8 @@ export default class Page extends React.Component {
     let amount = 0;
     let total = 0;
     if (this.state.covidOccurence) {
-      let first = this.state.covidOccurence[0];
-      let second = this.state.covidOccurence[1];
-      if (first.key == 'relevant') {
-        amount = first.value;
-        total = second.value + amount;
-      } else {
-        amount = second.value;
-        total = first.value + amount;
-      }
+      amount = this.state.covidOccurence.find(c => c.key == 'relevant').value;
+      total = this.state.covidOccurence.find(c => c.key == 'total').value
     }
     let covid_ratio = amount + ' of ' + total + ' tweets mention Covid-19';
     if (total == 0) covid_ratio = '';
@@ -213,10 +226,12 @@ export default class Page extends React.Component {
               <DomesticAbuseMap
                 height={'500px'}
                 loading={this.state.loading}
+                tweetLoading={this.state.tweetLoading}
                 twitterData={this.state.twitterData}
                 domVioData={this.state.domVioData}
                 geometryData={this.state.mapData.geometryData}
                 mapCoordinateData={this.state.mapData.mapCoordinateData}
+                onRequestMoreTweets={this.onRequestMoreTweets}
               />
             </Col>
           </Row>
