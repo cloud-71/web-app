@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Jumbotron from 'react-bootstrap/Jumbotron';
+import pointInPolygon from 'point-in-polygon';
 
 export default class Page extends React.Component {
   constructor(props) {
@@ -80,10 +81,31 @@ export default class Page extends React.Component {
 
   async fetchTweetData() {
     this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi');
+    let twitterData = await fetch('/api/twitterDBapi?transform=true');
     twitterData = await twitterData.json();
     this.setState({ twitterData });
     this.setState({ loading: false });
+  }
+
+  countOfTweetsPerArea(){
+    let res = {};
+    const geoData = this.state.mapData.geometryData;
+    const tweets = this.state.twitterData.twitterData;
+    if (geoData == null || tweets == null) return;
+
+    for (let locationName in geoData){
+      res[locationName] = 0;
+      //get the polygon that defines an area's boundaries
+      const polygon = geoData[locationName].coordinates[0][0];
+      for (let tweet of tweets){
+        const point = tweet.doc.coordinates && tweet.doc.coordinates.coordinates;
+        //check if the tweet's location in inside the area
+        if (point != null && pointInPolygon(point, polygon)){
+          res[locationName] += 1;
+        }
+      }
+    }
+    return res;
   }
 
   scrollTo(element) {
@@ -191,6 +213,7 @@ export default class Page extends React.Component {
               <h3>Graphs</h3>
               <DomesticAbuseGraphs
                 domVioData={this.state.domVioDataGraph}
+                countOfTweetsPerArea={this.countOfTweetsPerArea()}
                 loading={this.state.loading}
               />
             </Col>

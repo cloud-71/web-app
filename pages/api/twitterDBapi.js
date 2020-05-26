@@ -58,7 +58,7 @@ async function geocode(geocoder, doc) {
 
   let result;
   try {
-    result = await geocoder.geocode(placename);
+    result = await geocoder.geocode({q: placename, addressdetails: 1, countrycodes:['AU']});
   } catch (e) {
     result = null;
   }
