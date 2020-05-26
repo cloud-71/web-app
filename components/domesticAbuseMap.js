@@ -12,7 +12,7 @@ export default class DomesticAbuseMap extends React.Component {
   constructor(props) {
     //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, tweetLoading, height, onRequestMoreTweets
     super(props);
-    this.state = { displayYear: '2015-2016' };
+    this.state = { displayYear: '2015-2016', redIcon:null};
   }
 
   async componentDidMount() {
@@ -30,6 +30,15 @@ export default class DomesticAbuseMap extends React.Component {
     //marker icons don't show up unless you do this
     L = await require('leaflet');
     L.Icon.Default.imagePath = 'images/';
+
+    let redIcon = Object.assign({}, L.Icon.Default.prototype.options);
+    redIcon.iconUrl = 'images/marker-icon-red.png';
+    redIcon.shadowUrl = "images/" + redIcon.shadowUrl;
+    redIcon.iconRetinaUrl = null;
+    redIcon.shadowRetinaUrl = null;
+    this.setState({
+      redIcon: L.icon(redIcon)
+    })
     this.forceUpdate();
   }
 
@@ -104,20 +113,38 @@ export default class DomesticAbuseMap extends React.Component {
     if (!this.props.twitterData) return;
 
     let twitterData = this.tweetLocations(this.props.twitterData);
+    let containsCovid = function(words){
+      return words.toLowerCase().includes("covid") ||
+             words.toLowerCase().includes("corona virus") ||
+             words.toLowerCase().includes("coronavirus");
+    }
 
     return Object.keys(twitterData['coordinates']).map((tweet) => (
-      //Spectrum is hard coded, had something to find maximum\
-      <Marker
-        draggable={false}
-        position={twitterData['coordinates'][tweet]}
-        key={tweet}
-      >
-        <Popup>
-          @{twitterData['user'][tweet]}
-          <br />
-          {twitterData['tweet'][tweet]}
-        </Popup>
-      </Marker>
+      containsCovid(twitterData['tweet'][tweet]) ?
+        <Marker
+          icon={this.state.redIcon}
+          draggable={false}
+          position={twitterData['coordinates'][tweet]}
+          key={tweet}
+        >
+          <Popup>
+            @{twitterData['user'][tweet]}
+            <br />
+            {twitterData['tweet'][tweet]}
+          </Popup>
+        </Marker>
+        :
+        <Marker
+          draggable={false}
+          position={twitterData['coordinates'][tweet]}
+          key={tweet}
+        >
+          <Popup>
+            @{twitterData['user'][tweet]}
+            <br />
+            {twitterData['tweet'][tweet]}
+          </Popup>
+        </Marker>
     ));
   }
 
