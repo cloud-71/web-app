@@ -10,11 +10,15 @@ export default async function (req, res) {
   const db = await twitterDB(connection);
   let options = {
     include_docs: true,
-    startkey: withCoordinatesOnly ? ['coordinates'] : ['place_name'],
-    endkey: withCoordinatesOnly ? ['coordinates', {}] : ['place_name', {}]
   }
   if (skip != null && limit != null)
     Object.assign(options, {limit, skip});
+  if (withCoordinatesOnly){
+    Object.assign(options, {
+      startkey: ['coordinates'],
+      endkey: ['coordinates', {}]
+    })
+  }
 
   let twitterData = await db.view('views', 'group_by_location', options);
   twitterData = twitterData.rows;
