@@ -4,12 +4,13 @@ import ColorInterpolate from 'color-interpolate';
 import Card from 'react-bootstrap/Card';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+import Button from 'react-bootstrap/Button';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Spinner from 'react-bootstrap/Spinner';
 
 export default class DomesticAbuseMap extends React.Component {
   constructor(props) {
-    //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, height
+    //props: domVioData, geometryData, mapCoordinateData, tweetData, loading, tweetLoading, height, onRequestMoreTweets
     super(props);
     this.state = { displayYear: '2015-2016' };
   }
@@ -68,6 +69,11 @@ export default class DomesticAbuseMap extends React.Component {
               Population
             </Card.Title>
             {yearButtons}
+            <Button variant="outline-secondary" size="sm"
+              disabled={this.props.tweetLoading}
+              onClick={this.props.onRequestMoreTweets}>
+                More Tweets
+            </Button>
           </Card.Body>
         </Card>
       </Control>
