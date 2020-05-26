@@ -82,22 +82,15 @@ export default class DomesticAbuseMap extends React.Component {
       tweet: {},
       user: {},
     };
-    twitterData
-      .map((d) => d.doc)
-      .forEach((d) => {
-        if (d.coordinates) {
-          console.log(d);
-        }
-        if (d.id && d.coordinates && d.user) {
-          //lat and long are backwards
-          obj['coordinates'][d.id] = [
-            d.coordinates.coordinates[1],
-            d.coordinates.coordinates[0],
-          ];
-          obj['tweet'][d.id] = d.full_text; //d.extended_tweet.full_text;
-          obj['user'][d.id] = d.user.screen_name;
-        }
-      });
+    twitterData.filter(d => d.key[0] == 'coordinates')
+      .forEach(d => {
+        obj['coordinates'][d.value.id] = [
+          d.key[1][1],
+          d.key[1][0],
+        ];
+        obj['tweet'][d.value.id] = d.value.full_text; //d.extended_tweet.full_text;
+        obj['user'][d.value.id] = d.value.user_name;
+      })
     return obj;
   }
 

@@ -85,7 +85,7 @@ export default class Page extends React.Component {
     //this.setState({ loading: true });
     //define an async function to fetch domestic violence data
     let fetchTwitterData = async function () {
-      let twitterData = await fetch('/api/twitterDBapi/twitterData?transform=true');
+      let twitterData = await fetch('/api/twitterDBapi/twitterData?withCoordinatesOnly=false');
       twitterData = await twitterData.json();
       this.setState({ twitterData });
     }.bind(this);
@@ -104,7 +104,7 @@ export default class Page extends React.Component {
 
     fetchTwitterData();
     fetchWordCountData();
-    //fetchCovidOccData();
+    fetchCovidOccData();
     //this.setState({ loading: false });
   }
 
@@ -152,10 +152,8 @@ export default class Page extends React.Component {
     let amount = 0;
     let total = 0;
     if (this.state.covidOccurence) {
-      let first = this.state.covidOccurence[0];
-      let second = this.state.covidOccurence[1];
-      amount = first.key == 'relevant' ? first.value : second.value;
-      total = first.value + second.value;
+      amount = this.state.covidOccurence.find(c => c.key == 'relevant').value;
+      total = this.state.covidOccurence.find(c => c.key == 'total').value
     }
     let covid_ratio = amount + ' of ' + total + ' tweets mention Covid-19';
     if (total == 0) covid_ratio = '';
