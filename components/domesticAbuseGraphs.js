@@ -10,37 +10,39 @@ export default class DomesticAbuseGraphs extends React.Component {
   constructor(props) {
     //props: domVioData, loading
     super(props);
-    this.state = {}
+    this.state = {};
   }
 
   graphs() {
     let data = this.props.domVioData;
-    if (data == null)
-      return;
+    if (data == null) return;
 
-    let cols = Object.keys(data).map(locationName => {
-      return <Col lg={4} md={3} sm={2} xs={1} key={locationName}>
-        <Card.Title>{locationName}</Card.Title>
-        <DomesticAbuseGraph data={data[locationName]} />
-      </Col>
-    })
+    let cols = Object.keys(data).map((locationName) => {
+      return (
+        <Col lg={4} md={3} sm={2} xs={1} key={locationName}>
+          <Card.Title>{locationName}</Card.Title>
+          <DomesticAbuseGraph data={data[locationName]} />
+        </Col>
+      );
+    });
     return cols;
   }
 
   render() {
     let graphs = this.graphs();
 
-    return (<>
-      <Row>
-        <Navbar sticky="top">
-          <Navbar.Text>Graphs</Navbar.Text>
-        </Navbar>
-      </Row>
-      <Row>
-        {!this.props.loading ?
-          graphs :
-          ""}
-      </Row>
-    </>)
+    return (
+      <>
+        <Row>
+          <Navbar sticky="top">
+            <Navbar.Text>
+              Victoria statistics. Compares year against rate of domestic
+              violence for everything 100,000 population
+            </Navbar.Text>
+          </Navbar>
+        </Row>
+        <Row>{!this.props.loading ? graphs : ''}</Row>
+      </>
+    );
   }
 }
