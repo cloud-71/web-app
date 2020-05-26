@@ -1,25 +1,11 @@
-import connection from '../../db/connection.js';
-import twitterDB from '../../db/twitterDB.js';
+import connection from '../../../db/connection.js';
+import twitterDB from '../../../db/twitterDB.js';
 import NodeGeocoder from 'node-geocoder';
-/*export default async function (req, res) {
-  const db = await twitterDB(connection);
-  let twitterData = await db.list({ include_docs: true });
-  const result = twitterData.rows;
-  res.status(200).json(result);
-}*/
 
 export default async function (req, res) {
   let geocodeTransform = req.query.transform == 'true';
 
   const db = await twitterDB(connection);
-  let wordCount = await db.view('views', 'sum_words', { group_level: 1 });
-  wordCount = wordCount.rows;
-
-  let covidOccurance = await db.view('views', 'covid_occurance', {
-    group_level: 1,
-  });
-  covidOccurance = covidOccurance.rows;
-
   let twitterData = await db.list({ include_docs: true });
   twitterData = twitterData.rows;
   //transform geodata into
@@ -43,8 +29,7 @@ export default async function (req, res) {
     }
   }
 
-  const result = { twitterData, wordCount, covidOccurance };
-  res.status(200).json(result);
+  res.status(200).json(twitterData);
 }
 
 async function geocode(geocoder, doc) {
@@ -58,7 +43,7 @@ async function geocode(geocoder, doc) {
 
   let result;
   try {
-    result = await geocoder.geocode({q: placename, addressdetails: 1, countrycodes:['AU']});
+    result = await geocoder.geocode({q: placename, limit: 1, addressdetails: 1, countrycodes:['AU']}); //limit it to Australia only
   } catch (e) {
     result = null;
   }

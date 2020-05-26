@@ -16,6 +16,8 @@ export default class Page extends React.Component {
       mapData: {},
       domVioData: {},
       twitterData: [],
+      wordCount: null,
+      covidOccurence: null,
       loading: false,
     };
     this.mapRef = React.createRef();
@@ -80,11 +82,30 @@ export default class Page extends React.Component {
   }
 
   async fetchTweetData() {
-    this.setState({ loading: true });
-    let twitterData = await fetch('/api/twitterDBapi?transform=true');
-    twitterData = await twitterData.json();
-    this.setState({ twitterData });
-    this.setState({ loading: false });
+    //this.setState({ loading: true });
+    //define an async function to fetch domestic violence data
+    let fetchTwitterData = async function () {
+      let twitterData = await fetch('/api/twitterDBapi/twitterData?transform=true');
+      twitterData = await twitterData.json();
+      this.setState({ twitterData });
+    }.bind(this);
+    //define an async function to fetch wordcloud data
+    let fetchWordCountData = async function () {
+      let wordCount = await fetch('/api/twitterDBapi/wordCount');
+      wordCount = await wordCount.json();
+      this.setState({ wordCount });
+    }.bind(this);
+    //define an async function to fetch wordcloud data
+    let fetchCovidOccData = async function () {
+      let covidOccurence = await fetch('/api/twitterDBapi/covidOccurence');
+      covidOccurence = await covidOccurence.json();
+      this.setState({ covidOccurence });
+    }.bind(this);
+
+    fetchTwitterData();
+    fetchWordCountData();
+    //fetchCovidOccData();
+    //this.setState({ loading: false });
   }
 
   countOfTweetsPerArea(){
@@ -130,9 +151,9 @@ export default class Page extends React.Component {
     //console.log('graphData', this.state.domVioDataGraph);
     let amount = 0;
     let total = 0;
-    if (this.state.twitterData.covidOccurance) {
-      let first = this.state.twitterData.covidOccurance[0];
-      let second = this.state.twitterData.covidOccurance[1];
+    if (this.state.covidOccurence) {
+      let first = this.state.covidOccurence[0];
+      let second = this.state.covidOccurence[1];
       if (first.key == 'relevant') {
         amount = first.value;
         total = second.value + amount;
@@ -183,8 +204,7 @@ export default class Page extends React.Component {
           <Row ref={this.mapRef}>
             <Col>
               <h3>Map</h3>
-
-              <Navbar sticky="top">
+              <Navbar>
                 <Navbar.Text>
                   Sourced from AURIN datasets in order to capture the historical
                   rates of known domestic violence cases.
@@ -193,7 +213,7 @@ export default class Page extends React.Component {
               <DomesticAbuseMap
                 height={'500px'}
                 loading={this.state.loading}
-                twitterData={this.state.twitterData.twitterData}
+                twitterData={this.state.twitterData}
                 domVioData={this.state.domVioData}
                 geometryData={this.state.mapData.geometryData}
                 mapCoordinateData={this.state.mapData.mapCoordinateData}
@@ -203,7 +223,7 @@ export default class Page extends React.Component {
           <Row ref={this.cloudRef}>
             <Col>
               <h3>Word Cloud</h3>
-              <WordCloud data={this.state.twitterData.wordCount} topK={60} />
+              <WordCloud data={this.state.wordCount} topK={60} />
               <br></br>
             </Col>
             <Col></Col>
