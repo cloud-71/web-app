@@ -51,7 +51,6 @@ async function geocode(geocoder, doc, db) {
 
   try {
     //find from cache
-    throw Exception(e)
     let cacheResult = await db.get(placename);
     if (cacheResult.coordinates == null) return; //null coordinates mean it couldn't be geocoded
 
