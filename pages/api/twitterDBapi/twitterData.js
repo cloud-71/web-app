@@ -50,15 +50,15 @@ async function geocode(geocoder, doc, db) {
     let result;
     try {
       result = await geocoder.geocode({q: placename, limit: 1, addressdetails: 1, countrycodes:['AU']}); //limit it to Australia only
-    } catch (e) {
-      console.log(e);
+    } catch (e2) {
+      console.log(e2);
       result = null;
     }
     if (result != null && result.length > 0) {
       let coordinates = [result[0].longitude, result[0].latitude]
       db.insert({_id: placename, coordinates, type:'placename_cache'}); //insert into cache
       doc.key = ['coordinates', coordinates]
-    } else if (result.length == 0){
+    } else if (result != null && result.length == 0){
        //insert into cache to determine it couldn't be found before
       db.insert({_id: placename, coordinates: null, type:'placename_cache'});
     }
