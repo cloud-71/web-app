@@ -16,7 +16,7 @@ export default class Page extends React.Component {
       mapData: {},
       domVioData: {},
       twitterData: [],
-      twitterDataFetchLimit: 15,
+      twitterDataFetchLimit: 5,
       wordCount: null,
       covidOccurence: null,
       loading: false,
@@ -109,8 +109,14 @@ export default class Page extends React.Component {
   async fetchTwitterData() {
     this.setState({tweetLoading: true});
     let limit = this.state.twitterDataFetchLimit;
-    let twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + this.state.twitterData.length + '&limit=' + limit);
-    twitterData = await twitterData.json();
+    let twitterData;
+    try {
+      let twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + this.state.twitterData.length + '&limit=' + limit);
+      twitterData = twitterData.ok ? await twitterData.json() : [];
+    } catch(e){
+      twitterData = [];
+    }
+
     this.setState(
       state => ({
         twitterData: state.twitterData.concat(twitterData),
