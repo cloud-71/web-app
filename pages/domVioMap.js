@@ -100,24 +100,27 @@ export default class Page extends React.Component {
       this.setState({ covidOccurence });
     }.bind(this);
 
-    this.fetchTwitterData();
+    this.fetchTwitterData(true);
     fetchWordCountData();
     fetchCovidOccData();
     //this.setState({ loading: false });
   }
 
   //define an async function to fetch domestic violence data
-  async fetchTwitterData() {
+  async fetchTwitterData(initial) {
     this.setState({tweetLoading: true});
     let limit = this.state.twitterDataFetchLimit;
     let skip = this.state.twitterDataSkip;
     let twitterData;
     let refetch;
     try {
-      twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + skip + '&limit=' + limit);
+      let optionString = initial ?
+          ('withCoordinatesOnly='+initial ) :
+          ('skip=' + skip + '&limit=' + limit + '&useGeocoding=true');
+      twitterData = await fetch('/api/twitterDBapi/twitterData?' + optionString);
       if (twitterData.ok){
         twitterData =  await twitterData.json();
-        refetch = twitterData.length == limit;
+        refetch = initial || twitterData.length == limit;
       } else {
         twitterData = [];
         refetch = true;
@@ -126,7 +129,7 @@ export default class Page extends React.Component {
       twitterData = [];
       refetch = true;
     }
-    let newSkip = skip + limit;
+    let newSkip = initial ? 0 : skip + limit;
     this.setState(
       state => ({
         twitterDataSkip: newSkip,
@@ -136,7 +139,7 @@ export default class Page extends React.Component {
       //after setting state is done, fetch again if there are more data
       () => {
         if (refetch){
-          this.fetchTwitterData();
+          this.fetchTwitterData(false);
         }
       });
   };

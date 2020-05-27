@@ -1,10 +1,11 @@
 import connection from '../../../db/connection.js';
 import twitterDB from '../../../db/twitterDB.js';
 import NodeGeocoder from 'node-geocoder';
+import nodeFetch from 'node-fetch';
 
 export default async function (req, res) {
   //let geocodeTransform = req.query.transform == 'true';
-  let { withCoordinatesOnly, skip, limit } = req.query;
+  let { withCoordinatesOnly, skip, limit, useGeocoding } = req.query;
   withCoordinatesOnly = withCoordinatesOnly == 'true';
 
   const db = await twitterDB(connection);
@@ -22,8 +23,18 @@ export default async function (req, res) {
   let twitterData = await db.view('views', 'group_by_location', options);
   twitterData = twitterData.rows;
   //transform geodata into
-  if (!withCoordinatesOnly) {
-    let geocoder = NodeGeocoder({ provider: 'openstreetmap' });
+  if (useGeocoding) {
+    let geocoder = NodeGeocoder({
+      provider: 'openstreetmap',
+      fetch: function(url, options){
+        return nodeFetch(url, {
+          ...options,
+          headers: {
+            'user-agent': 'UniMelb COMP90024 Team 71 2020S1',
+          }
+        });
+      }
+    });
     let promises = [];
 
     for (let data of twitterData.filter((d) => d.key[0] == 'place_name')) {
@@ -40,6 +51,7 @@ async function geocode(geocoder, doc, db) {
 
   try {
     //find from cache
+    throw Exception(e)
     let cacheResult = await db.get(placename);
     if (cacheResult.coordinates == null) return; //null coordinates mean it couldn't be geocoded
 
@@ -55,7 +67,7 @@ async function geocode(geocoder, doc, db) {
         countrycodes: ['AU'],
       }); //limit it to Australia only
     } catch (e2) {
-      console.log('twitterData: e2');
+      console.log(e2);
       result = null;
       return;
     }
