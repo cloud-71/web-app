@@ -107,7 +107,7 @@ export default class Page extends React.Component {
   }
 
   //define an async function to fetch domestic violence data
-  async fetchTwitterData(initial) {
+  async fetchTwitterData(initial, tries=0) {
     this.setState({tweetLoading: true});
     let limit = this.state.twitterDataFetchLimit;
     let skip = this.state.twitterDataSkip;
@@ -121,14 +121,18 @@ export default class Page extends React.Component {
       if (twitterData.ok){
         twitterData =  await twitterData.json();
         refetch = initial || twitterData.length == limit;
+        tries = 0;
       } else {
         twitterData = [];
         refetch = true;
+        tries = tries + 1;
       }
     } catch(e){
       twitterData = [];
       refetch = true;
+      tries = tries + 1;
     }
+    if (tries >= 10) refetch = false;
     let newSkip = initial ? 0 : skip + limit;
     this.setState(
       state => ({
@@ -139,7 +143,7 @@ export default class Page extends React.Component {
       //after setting state is done, fetch again if there are more data
       () => {
         if (refetch){
-          this.fetchTwitterData(false);
+          this.fetchTwitterData(false, tries);
         }
       });
   };
@@ -181,7 +185,7 @@ export default class Page extends React.Component {
   }
 
   onRequestMoreTweets(){
-    this.fetchTwitterData();
+    this.fetchTwitterData(true);
   }
 
   render() {
