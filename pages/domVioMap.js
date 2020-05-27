@@ -17,6 +17,7 @@ export default class Page extends React.Component {
       domVioData: {},
       twitterData: [],
       twitterDataFetchLimit: 5,
+      twitterDataSkip: 0,
       wordCount: null,
       covidOccurence: null,
       loading: false,
@@ -109,22 +110,32 @@ export default class Page extends React.Component {
   async fetchTwitterData() {
     this.setState({tweetLoading: true});
     let limit = this.state.twitterDataFetchLimit;
+    let skip = this.state.twitterDataSkip;
     let twitterData;
+    let refetch;
     try {
-      let twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + this.state.twitterData.length + '&limit=' + limit);
-      twitterData = twitterData.ok ? await twitterData.json() : [];
+      twitterData = await fetch('/api/twitterDBapi/twitterData?skip=' + skip + '&limit=' + limit);
+      if (twitterData.ok){
+        twitterData =  await twitterData.json();
+        refetch = twitterData.length == limit;
+      } else {
+        twitterData = [];
+        refetch = true;
+      }
     } catch(e){
       twitterData = [];
+      refetch = true;
     }
-
+    let newSkip = skip + limit;
     this.setState(
       state => ({
+        twitterDataSkip: newSkip,
         twitterData: state.twitterData.concat(twitterData),
         tweetLoading: false
       }),
       //after setting state is done, fetch again if there are more data
       () => {
-        if (twitterData.length == limit){
+        if (refetch){
           this.fetchTwitterData();
         }
       });
